@@ -9,64 +9,32 @@ function Base64Encoder()
 {
 	// static methods
 
-	Base64Encoder.encodeBytes = function(bytesToEncode)
+	Base64Encoder.bytesToStringBase64 = function(bytes)
 	{
-		// Encode each three sets of eight bits (octets, or bytes)
-		// as four sets of six bits (sextets, or Base 64 digits)
-
-		var returnString = "";
-
-		var bytesPerSet = 3;
-		var base64DigitsPerSet = 4;
-
-		var base64DigitsAsString =
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-			+ "abcdefghijklmnopqrstuvwxyz"
-			+ "0123456789"
-			+ "+/";
-
-		var numberOfBytesToEncode = bytesToEncode.length;
-		var numberOfFullSets = Math.floor(numberOfBytesToEncode / bytesPerSet);
-		var numberOfBytesInFullSets = numberOfFullSets * bytesPerSet;
-		var numberOfBytesLeftAtEnd = numberOfBytesToEncode - numberOfBytesInFullSets;
-
-		for (var s = 0; s < numberOfFullSets; s++)
+		var bytesAsBinaryString = "";
+		for (var i = 0; i < bytes.length; i++)
 		{
-			var b = s * bytesPerSet;
-
-			var valueToEncode =
-				(bytesToEncode[b] << Constants.BitsPerByteTimesTwo)
-				| (bytesToEncode[b + 1] << Constants.BitsPerByte)
-				| (bytesToEncode[b + 2]);
-
-			returnString += base64DigitsAsString[((valueToEncode & 0xFC0000) >>> 18)];
-			returnString += base64DigitsAsString[((valueToEncode & 0x03F000) >>> 12)];
-			returnString += base64DigitsAsString[((valueToEncode & 0x000FC0) >>> 6)];
-			returnString += base64DigitsAsString[((valueToEncode & 0x00003F))];
+			var byte = bytes[i];
+			var byteAsChar = String.fromCharCode(byte);
+			bytesAsBinaryString += byteAsChar;
 		}
 
-		var b = numberOfFullSets * bytesPerSet;
+		var returnValue = btoa(bytesAsBinaryString);
 
-		if (numberOfBytesLeftAtEnd == 1)
-		{
-			var valueToEncode = (bytesToEncode[b] << 16);
-
-			returnString += base64DigitsAsString[((valueToEncode & 0xFC0000) >>> 18)];
-			returnString += base64DigitsAsString[((valueToEncode & 0x03F000) >>> 12)];
-			returnString += "==";
-		}
-		else if (numberOfBytesLeftAtEnd == 2)
-		{
-			var valueToEncode =
-				(bytesToEncode[b] << 16)
-				| (bytesToEncode[b + 1] << 8);
-
-			returnString += base64DigitsAsString[((valueToEncode & 0xFC0000) >>> 18)];
-			returnString += base64DigitsAsString[((valueToEncode & 0x03F000) >>> 12)];
-			returnString += base64DigitsAsString[((valueToEncode & 0x000FC0) >>> 6)];
-			returnString += "=";
-		}
-
-		return returnString;
+		return returnValue;
 	}
+
+	Base64Encoder.stringBase64ToBytes = function(stringBase64)
+	{
+		var bytesAsBinaryString = atob(stringBase64);
+		var bytes = [];
+		for (var i = 0; i < bytesAsBinaryString.length; i++)
+		{
+			var byte = bytesAsBinaryString.charCodeAt(i);
+			bytes.push(byte);
+		}
+
+		return bytes;
+	}
+
 }

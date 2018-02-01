@@ -211,7 +211,7 @@ function SoundEditor
 
 		var soundAsBytes = soundAsWavFile.writeToBytes();
 
-		var soundAsStringBase64 = Base64Encoder.encodeBytes(soundAsBytes);
+		var soundAsStringBase64 = Base64Encoder.bytesToStringBase64(soundAsBytes);
 
 		var soundAsDataURI = 'data:audio/wav;base64,' + soundAsStringBase64;
 

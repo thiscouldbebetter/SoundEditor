@@ -8,7 +8,7 @@ function NumberExtensions()
 	Number.prototype.trimToRange = function(range)
 	{
 		var value = this;
-		
+
 		if (value < 0)
 		{
 			value = 0;

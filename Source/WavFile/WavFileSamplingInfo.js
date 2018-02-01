@@ -1,7 +1,7 @@
 
 function WavFileSamplingInfo
 (
-	name,	
+	name,
 	chunkSizeInBytes,
 	formatCode,
 	numberOfChannels,

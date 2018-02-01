@@ -60,7 +60,7 @@ function WavFile
 
 	WavFile.prototype.readFromFile_ReadChunks = function(reader)
 	{
-		var riffStringAsBytes = reader.readBytes(4);		
+		var riffStringAsBytes = reader.readBytes(4);
 
 		var numberOfBytesInFile = reader.readInt();
 
