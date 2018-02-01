@@ -1,7 +1,7 @@
 
 function ByteStreamLittleEndian(bytes)
 {
-	this.bytes = bytes;  
+	this.bytes = bytes;
 
 	this.numberOfBytesTotal = this.bytes.length;
 	this.byteIndexCurrent = 0;

@@ -11,7 +11,7 @@ function StringHelper()
 
 		while (returnValue.length < lengthAfterPadding)
 		{
-			returnValue = 
+			returnValue =
 				stringToPadWith
 				+ returnValue;
 		}

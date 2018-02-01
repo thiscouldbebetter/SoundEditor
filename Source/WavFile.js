@@ -18,7 +18,7 @@ function WavFile
 
 	if (this.samplesForChannels == null)
 	{
-		var numberOfChannels = this.samplingInfo.numberOfChannels; 
+		var numberOfChannels = this.samplingInfo.numberOfChannels;
 
 		this.samplesForChannels = [];
 		for (var c = 0; c < numberOfChannels; c++)
@@ -36,7 +36,7 @@ function WavFile
 	// static methods
 
 	WavFile.readFromFile = function(fileToReadFrom, callback)
-	{		
+	{
 		var returnValue = new WavFile(fileToReadFrom.name, null, null);
 
 		var fileReader = new FileReader();
@@ -60,7 +60,7 @@ function WavFile
 
 	WavFile.prototype.readFromFile_ReadChunks = function(reader)
 	{
-		var riffStringAsBytes = reader.readBytes(4);		  
+		var riffStringAsBytes = reader.readBytes(4);		
 
 		var numberOfBytesInFile = reader.readInt();
 
@@ -97,7 +97,7 @@ function WavFile
 			samplesForChannelsMixedAsBytes
 		);
 
-		this.samplesForChannels = samplesForChannels;	
+		this.samplesForChannels = samplesForChannels;
 	}
 
 	WavFile.prototype.readFromFile_ReadChunks_Format = function(reader)
@@ -113,8 +113,8 @@ function WavFile
 		var bitsPerSample = reader.readShort();
 
 		var numberOfBytesInChunkSoFar = 16;
-		var numberOfExtraBytesInChunk = 
-			chunkSizeInBytes 
+		var numberOfExtraBytesInChunk =
+			chunkSizeInBytes
 			- numberOfBytesInChunkSoFar;
 
 		var extraBytes = reader.readBytes(numberOfExtraBytesInChunk)
@@ -147,7 +147,7 @@ function WavFile
 	WavFile.prototype.appendClipFromWavFileBetweenTimesStartAndEnd = function
 	(
 		wavFileToClipFrom,
-		timeStartInSeconds, 
+		timeStartInSeconds,
 		timeEndInSeconds
 	)
 	{
@@ -173,7 +173,7 @@ function WavFile
 			for (var s = timeStartInSamples; s <= timeEndInSamples; s++)
 			{
 				var sample = samplesForChannelSource[s];
-				samplesForChannelTarget.push(sample);	
+				samplesForChannelTarget.push(sample);
 			}
 		}
 
@@ -191,7 +191,7 @@ function WavFile
 			}
 		}
 
-		return returnValue;		
+		return returnValue;
 	}
 
 	WavFile.prototype.durationInSeconds = function()
@@ -239,7 +239,7 @@ function WavFile
 		writer.writeString("RIFF");
 
 		// hack
-		var numberOfBytesOfOverhead = 
+		var numberOfBytesOfOverhead =
 			"RIFF".length
 			+ "WAVE".length
 			+ "fmt ".length
@@ -248,7 +248,7 @@ function WavFile
 
 			//+ 4; // additional bytes in data header?
 
-		var numberOfBytesInFile = 
+		var numberOfBytesInFile =
 			this.samplingInfo.numberOfChannels
 			* this.samplesForChannels[0].length
 			* this.samplingInfo.bitsPerSample
@@ -296,5 +296,41 @@ function WavFile
 		{
 			writer.writeBytes(this.samplingInfo.extraBytes);
 		}
+	}
+
+	// json
+
+	WavFile.fromStringJSON = function(wavFileAsJSON)
+	{
+		var wavFile = JSON.parse(wavFileAsJSON);
+		wavFile = WavFile.objectPrototypesSet(wavFile);
+		return wavFile;
+	}
+
+	WavFile.objectPrototypesSet = function(wavFile)
+	{
+		wavFile.__proto__ = WavFile.prototype;
+
+		wavFile.samplingInfo.__proto__ = WavFileSamplingInfo.prototype;
+
+		var channels = wavFile.samplesForChannels;
+		for (var c = 0; c < channels.length; c++)
+		{
+			var samplesForChannel = channels[c];
+
+			for (var s = 0; s < samplesForChannel.length; s++)
+			{
+				var sample = samplesForChannel[s];
+				sample.__proto__ = WavFileSample.prototype;
+			}
+		}
+
+		return wavFile;
+	}
+
+	WavFile.prototype.toStringJSON = function()
+	{
+		var returnValue = JSON.stringify(this);
+		return returnValue;
 	}
 }

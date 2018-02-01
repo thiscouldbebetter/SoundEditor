@@ -1,13 +1,13 @@
 
 function ByteConverter(numberOfBits)
-{	
+{
 	this.numberOfBits = numberOfBits;
 	this.numberOfBytes = Math.floor(this.numberOfBits / 8);
 
-	this.maxValueSigned = 
-		(1 << (numberOfBits - 1)) - 1;	
+	this.maxValueSigned =
+		(1 << (numberOfBits - 1)) - 1;
 
-	this.maxValueUnsigned = 
+	this.maxValueUnsigned =
 		(1 << (numberOfBits));
 }
 
@@ -61,7 +61,7 @@ function ByteConverter(numberOfBits)
 
 	ByteConverter.prototype.integerToFloat = function(integer)
 	{
-		var returnValue = 
+		var returnValue =
 			integer / this.maxValueSigned;
 
 		return returnValue;

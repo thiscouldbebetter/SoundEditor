@@ -12,8 +12,8 @@ function Filter(name, applyToSampleAtTimeWithParameters)
 	{
 		this.Amplify = new Filter
 		(
-			"Amplify", 
-			function(sample, timeInSeconds, parameters) 
+			"Amplify",
+			function(sample, timeInSeconds, parameters)
 			{
 				var amplificationFactor = parseFloat(parameters);
 				if (isNaN(amplificationFactor) == true)
@@ -26,8 +26,8 @@ function Filter(name, applyToSampleAtTimeWithParameters)
 
 		this.Silence = new Filter
 		(
-			"Silence", 
-			function(sample, timeInSeconds, parameters) 
+			"Silence",
+			function(sample, timeInSeconds, parameters)
 			{
 				return 0;
 			}
@@ -35,14 +35,14 @@ function Filter(name, applyToSampleAtTimeWithParameters)
 
 		this.Sine = new Filter
 		(
-			"Sine", 
-			function(sample, timeInSeconds, parameters) 
+			"Sine",
+			function(sample, timeInSeconds, parameters)
 			{
 				var cyclesPerSecond = parseFloat(parameters);
 				if (isNaN(cyclesPerSecond) == true)
 				{
 					return sample;
-				}		
+				}
 				var timeInCycles = timeInSeconds * cyclesPerSecond;
 				var amplitude = .5;
 				sample = Math.sin(timeInCycles * Math.PI * 2) * amplitude;
@@ -51,7 +51,7 @@ function Filter(name, applyToSampleAtTimeWithParameters)
 		);
 
 
-		this._All = 
+		this._All =
 		[
 			this.Amplify,
 			this.Silence,

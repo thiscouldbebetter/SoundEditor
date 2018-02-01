@@ -17,16 +17,16 @@ function TimeHelper()
 		var secondsPastMinute = Math.floor(secondsTotal % TimeHelper.SecondsPerMinute);
 		var millisecondsPastSecond = Math.floor
 		(
-			(secondsTotal * TimeHelper.MillisecondsPerSecond) 
+			(secondsTotal * TimeHelper.MillisecondsPerSecond)
 			% TimeHelper.MillisecondsPerSecond
 		);
 
-		var hoursPadded = StringHelper.padLeft("" + hours, "0", 2); 
+		var hoursPadded = StringHelper.padLeft("" + hours, "0", 2);
 		var minutesPastHourPadded = StringHelper.padLeft("" + minutesPastHour, "0", 2);
 		var secondsPastMinutePadded = StringHelper.padLeft("" + secondsPastMinute, "0", 2);
 		var millisecondsPastSecondPadded = StringHelper.padLeft("" + millisecondsPastSecond, "0", 3);
 
-		var returnValue = 
+		var returnValue =
 			hoursPadded + ":"
 			+ minutesPastHourPadded + ":"
 			+ secondsPastMinutePadded + "," // French radix point
@@ -41,7 +41,7 @@ function TimeHelper()
 
 		var millisecondsPastSecond = Math.floor
 		(
-			(secondsTotal * TimeHelper.MillisecondsPerSecond) 
+			(secondsTotal * TimeHelper.MillisecondsPerSecond)
 			% TimeHelper.MillisecondsPerSecond
 		);
 
@@ -50,8 +50,8 @@ function TimeHelper()
 			"" + millisecondsPastSecond, "0", 3
 		);
 
-		var returnValue = 
-			+ secondsWhole + "." 
+		var returnValue =
+			+ secondsWhole + "."
 			+ millisecondsPastSecondPadded;
 
 		return returnValue;

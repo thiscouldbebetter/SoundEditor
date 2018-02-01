@@ -19,8 +19,8 @@ function Base64Encoder()
 		var bytesPerSet = 3;
 		var base64DigitsPerSet = 4;
 
-		var base64DigitsAsString = 
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+		var base64DigitsAsString =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			+ "abcdefghijklmnopqrstuvwxyz"
 			+ "0123456789"
 			+ "+/";
@@ -34,7 +34,7 @@ function Base64Encoder()
 		{
 			var b = s * bytesPerSet;
 
-			var valueToEncode = 
+			var valueToEncode =
 				(bytesToEncode[b] << Constants.BitsPerByteTimesTwo)
 				| (bytesToEncode[b + 1] << Constants.BitsPerByte)
 				| (bytesToEncode[b + 2]);
@@ -43,7 +43,7 @@ function Base64Encoder()
 			returnString += base64DigitsAsString[((valueToEncode & 0x03F000) >>> 12)];
 			returnString += base64DigitsAsString[((valueToEncode & 0x000FC0) >>> 6)];
 			returnString += base64DigitsAsString[((valueToEncode & 0x00003F))];
-		}	
+		}
 
 		var b = numberOfFullSets * bytesPerSet;
 
@@ -54,10 +54,10 @@ function Base64Encoder()
 			returnString += base64DigitsAsString[((valueToEncode & 0xFC0000) >>> 18)];
 			returnString += base64DigitsAsString[((valueToEncode & 0x03F000) >>> 12)];
 			returnString += "==";
-		}		
+		}
 		else if (numberOfBytesLeftAtEnd == 2)
 		{
-			var valueToEncode = 
+			var valueToEncode =
 				(bytesToEncode[b] << 16)
 				| (bytesToEncode[b + 1] << 8);
 

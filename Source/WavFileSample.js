@@ -37,7 +37,7 @@ function WavFileSample()
 		var sampleValueAsBytes = [];
 
 		for (var s = 0; s < samplesPerChannel; s++)
-		{				
+		{
 			for (var c = 0; c < numberOfChannels; c++)
 			{
 				sampleValueAsBytes.length = 0;
@@ -103,9 +103,9 @@ function WavFileSample()
 					returnBytes[b] = sampleAsBytes[i];
 					b++;
 				}
-			}						
+			}
 		}
 
 		return returnBytes;
-	}	
+	}
 }

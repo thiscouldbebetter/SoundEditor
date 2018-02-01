@@ -13,7 +13,7 @@ function Track(name, sounds)
 		for (var i = 0; i < this.sounds.length; i++)
 		{
 			var sound = this.sounds[i];
-			var soundEndInSeconds = 
+			var soundEndInSeconds =
 				sound.offsetWithinTrackInSeconds
 				+ sound.durationInSeconds();
 
@@ -55,21 +55,21 @@ function Track(name, sounds)
 	}
 
 	Track.prototype.domElementUpdate_Background = function(viewSizeInPixels)
-	{	
+	{
 		this.graphics.fillStyle = SoundEditor.ColorViewBackground;
 		this.graphics.strokeStyle = SoundEditor.ColorViewBorder;
 		this.graphics.fillRect
 		(
-			0, 
-			0, 
-			viewSizeInPixels.x, 
+			0,
+			0,
+			viewSizeInPixels.x,
 			viewSizeInPixels.y
 		);
 		this.graphics.strokeRect
 		(
-			0, 
-			0, 
-			viewSizeInPixels.x, 
+			0,
+			0,
+			viewSizeInPixels.x,
 			viewSizeInPixels.y
 		);
 	}
@@ -106,13 +106,13 @@ function Track(name, sounds)
 			this.domElementUpdate_Selection(soundEditor, selectionCurrent);
 		}
 
-		var cursorPosInPixels = 
+		var cursorPosInPixels =
 			(
 				soundEditor.cursorOffsetInSeconds
 				- soundEditor.viewOffsetInSeconds
 			)
 			* soundEditor.viewSizeInPixels.x
-			/ soundEditor.viewWidthInSeconds; 
+			/ soundEditor.viewWidthInSeconds;
 
 		this.graphics.strokeStyle = SoundEditor.ColorViewCursor;
 		this.graphics.strokeRect
@@ -131,10 +131,10 @@ function Track(name, sounds)
 		var selectionDurationInSeconds = selectionCurrent.durationInSeconds();
 
 		var timesStartAndEndInSeconds = selectionCurrent.timesStartAndEndInSeconds;
-		var timeStartInSecondsRelative = 
-			timesStartAndEndInSeconds[0] 
+		var timeStartInSecondsRelative =
+			timesStartAndEndInSeconds[0]
 			- soundEditor.viewOffsetInSeconds;
-		var timeEndInSecondsRelative = 
+		var timeEndInSecondsRelative =
 			timesStartAndEndInSeconds[1]
 			- soundEditor.viewOffsetInSeconds;
 
@@ -143,26 +143,26 @@ function Track(name, sounds)
 		// todo - reversible selections?
 
 		var selectionStartInPixels = timeStartInSecondsRelative / secondsPerPixel;
-	
-		var selectionSizeInPixels = 
+
+		var selectionSizeInPixels =
 			selectionDurationInSeconds
 			/ secondsPerPixel;
 
 		this.graphics.fillStyle = SoundEditor.ColorViewSelectionFill;
 		this.graphics.strokeStyle = SoundEditor.ColorViewSelectionBorder;
-	
+
 		this.graphics.fillRect
 		(
 			selectionStartInPixels, 0,
 			selectionSizeInPixels, viewSizeInPixels.y
 		);
-	
+
 		this.graphics.strokeRect
 		(
 			selectionStartInPixels, 0,
 			selectionSizeInPixels, viewSizeInPixels.y
 		);
-	
+
 		if (selectionCurrent.tag != null)
 		{
 			this.graphics.fillStyle = SoundEditor.ColorViewText;
@@ -170,7 +170,7 @@ function Track(name, sounds)
 			this.graphics.fillText
 			(
 				selectionCurrent.toString(),
-				selectionStartInPixels + 2, 
+				selectionStartInPixels + 2,
 				SoundEditor.TextHeightInPixels
 			);
 		}
@@ -186,7 +186,7 @@ function Track(name, sounds)
 
 		var soundOffsetWithinTrackInSamples = Math.round
 		(
-			sound.offsetWithinTrackInSeconds 
+			sound.offsetWithinTrackInSeconds
 			* samplesPerSecond
 		);
 
@@ -195,7 +195,7 @@ function Track(name, sounds)
 
 		var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
 		var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
-		var samplePosInPixels = new Coords(0, viewSizeInPixelsHalf.y); 
+		var samplePosInPixels = new Coords(0, viewSizeInPixelsHalf.y);
 		var sampleValue = 0;
 
 		this.graphics.beginPath();
@@ -204,16 +204,16 @@ function Track(name, sounds)
 
 		for (var i = 0; i < viewWidthInSamples; i++)
 		{
-			var sampleIndex = 
-				i 
+			var sampleIndex =
+				i
 				+ viewOffsetInSamples
 				- soundOffsetWithinTrackInSamples;
 
 			if (sampleIndex >= 0 && sampleIndex <= samples.length)
-			{	
-				var samplePosInPixelsXNext = 
-					i 
-					* viewSizeInPixels.x 
+			{
+				var samplePosInPixelsXNext =
+					i
+					* viewSizeInPixels.x
 					/ viewWidthInSamples;
 
 				if (samplePosInPixelsXNext != samplePosInPixels.x)
@@ -223,22 +223,22 @@ function Track(name, sounds)
 					sampleValue = byteConverter.integerToFloat
 					(
 						sampleBytes
-					);	
+					);
 
 					samplePosInPixels.x = samplePosInPixelsXNext;
-	
-					samplePosInPixels.y = 
-						viewSizeInPixelsHalf.y 
-						+ 
+
+					samplePosInPixels.y =
+						viewSizeInPixelsHalf.y
+						+
 						(
 							sampleValue
 							* viewSizeInPixelsHalf.y
 							* .8 // max amplitude
 						);
-	
+
 					this.graphics.lineTo
 					(
-						samplePosInPixels.x, 
+						samplePosInPixels.x,
 						samplePosInPixels.y
 					);
 				}
@@ -284,9 +284,9 @@ function Track(name, sounds)
 			var timeStartInSeconds = timesStartAndEndInSeconds[0];
 			var timeEndInSeconds = timesStartAndEndInSeconds[1];
 
-			var isClickWithinSelection = 
+			var isClickWithinSelection =
 			(
-				clickOffsetInSeconds >= timeStartInSeconds 
+				clickOffsetInSeconds >= timeStartInSeconds
 				&& clickOffsetInSeconds <= timeEndInSeconds
 			);
 
@@ -335,18 +335,18 @@ function Track(name, sounds)
 
 	Track.prototype.mousePointerOffsetInSecondsForEvent = function(event)
 	{
-		var mousePointerPosInPixels = 
+		var mousePointerPosInPixels =
 			event.x
 			- event.srcElement.getBoundingClientRect().left;
 
 		var soundEditor = Globals.Instance.soundEditor;
 
-		var mousePointerPosInSeconds = 
-			mousePointerPosInPixels 
-			* soundEditor.viewWidthInSeconds 
+		var mousePointerPosInSeconds =
+			mousePointerPosInPixels
+			* soundEditor.viewWidthInSeconds
 			/ soundEditor.viewSizeInPixels.x;
 
-		var mousePointerOffsetInSeconds = 
+		var mousePointerOffsetInSeconds =
 			mousePointerPosInSeconds
 			+ soundEditor.viewOffsetInSeconds
 

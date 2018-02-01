@@ -1,7 +1,7 @@
 
 function SoundEditor
 (
-	viewSizeInPixels, 
+	viewSizeInPixels,
 	session
 )
 {
@@ -88,7 +88,7 @@ function SoundEditor
 
 		var filterSelected = this.selectFilterType.selectedOptions[0].entity;
 		var parametersForFilter = this.inputFilterParameters.value;
-		
+
 		var sound = track.sounds[0];
 
 		var soundSource = sound.sourceWavFile;
@@ -131,7 +131,7 @@ function SoundEditor
 				var sampleAsFloatAbsolute = Math.abs(sampleAsFloat);
 				if (sampleAsFloatAbsolute > 1)
 				{
-					sampleAsFloat /= sampleAsFloatAbsolute;	
+					sampleAsFloat /= sampleAsFloatAbsolute;
 				}
 
 				sample = byteConverter.floatToInteger(sampleAsFloat);
@@ -140,7 +140,7 @@ function SoundEditor
 		}
 
 		this.domElementUpdate();
-	}	
+	}
 
 	SoundEditor.prototype.play = function()
 	{
@@ -169,7 +169,7 @@ function SoundEditor
 			var samplesForChannels = [];
 			for (var i = 0; i < numberOfChannels; i++)
 			{
-				samplesForChannels.push([]);	
+				samplesForChannels.push([]);
 			}
 
 			selectionAsWavFile = new WavFile
@@ -189,7 +189,7 @@ function SoundEditor
 			soundToPlay = new Sound
 			(
 				"[current selection]",
-				0, // offsetWithinTrackInSeconds, 
+				0, // offsetWithinTrackInSeconds,
 				selectionAsWavFile
 			);
 		}
@@ -280,7 +280,7 @@ function SoundEditor
 				this.domElementUpdate();
 				break;
 			}
-		}		
+		}
 	}
 
 	SoundEditor.prototype.selectionResize = function
@@ -336,7 +336,7 @@ function SoundEditor
 				this.domElementUpdate();
 				break;
 			}
-		}		
+		}
 	}
 
 	SoundEditor.prototype.selectionTag = function()
@@ -360,7 +360,7 @@ function SoundEditor
 			if (doesSelectionCurrentOverlapWithAnyExisting == false)
 			{
 				var tagText = this.inputTagText.value;
-				this.selectionCurrent.tag = tagText;			
+				this.selectionCurrent.tag = tagText;
 				selectionsTagged.push(this.selectionCurrent);
 				selectionsTagged[this.selectionCurrent.tag] = this.selectionCurrent;
 			}
@@ -393,7 +393,7 @@ function SoundEditor
 			srcElement.parentElement.removeChild(srcElement);
 
 			FileHelper.loadFileAsText(fileToLoad, callback);
-		}	
+		}
 
 		this.divControlsFile.insertBefore
 		(
@@ -414,19 +414,6 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.serializer = function()
-	{
-		return new Serializer
-		([
-			Selection,
-			Session,
-			Sound,
-			Track,
-			WavFile,
-			WavFileSamplingInfo,
-		]);
-	}
-
 	SoundEditor.prototype.sessionLoad = function()
 	{
 		var inputFileToLoad = document.createElement("input");
@@ -439,7 +426,7 @@ function SoundEditor
 			srcElement.parentElement.removeChild(srcElement);
 
 			FileHelper.loadFileAsText(fileToLoad, callback);
-		}	
+		}
 
 		this.divControlsFile.insertBefore
 		(
@@ -450,11 +437,9 @@ function SoundEditor
 
 	SoundEditor.prototype.sessionLoad_LoadComplete = function(textFromFile)
 	{
-		var serializer = this.serializer();
-
 		this.domElementRemove();
 
-		this.session = serializer.deserialize(textFromFile);
+		this.session = Session.fromStringJSON(textFromFile);
 
 		this.session.addLookups();
 
@@ -480,11 +465,9 @@ function SoundEditor
 
 	SoundEditor.prototype.sessionSave = function()
 	{
-		var serializer = this.serializer();
-
 		this.domElementRemove();
 
-		var sessionAsJSON = serializer.serialize(this.session);
+		var sessionAsJSON = this.session.toStringJSON();
 
 		FileHelper.saveTextAsFile(sessionAsJSON, this.session.name + ".json");
 
@@ -508,11 +491,11 @@ function SoundEditor
 		var soundToExportAsBytes = wavFileToExport.writeToBytes();
 
 		var filename = this.session.tagsToPlay + ".wav";
-		
+
 		FileHelper.saveBytesToFile
 		(
-			soundToExportAsBytes, 
-			filename	
+			soundToExportAsBytes,
+			filename
 		);
 	}
 
@@ -536,12 +519,12 @@ function SoundEditor
 	SoundEditor.prototype.tagsPlay_BuildSound = function(soundToSelectFrom)
 	{
 		var soundAsWavFileSource = soundToSelectFrom.sourceWavFile;
-		
+
 		var numberOfChannels = soundAsWavFileSource.samplesForChannels.length;
 		var samplesForChannels = [];
 		for (var i = 0; i < numberOfChannels; i++)
 		{
-			samplesForChannels.push([]);	
+			samplesForChannels.push([]);
 		}
 
 		var soundAsWavFileTarget = new WavFile
@@ -562,7 +545,7 @@ function SoundEditor
 			if (tag != null)
 			{
 				var timesStartAndEndInSeconds = tag.timesStartAndEndInSeconds;
-	
+
 				soundAsWavFileTarget.appendClipFromWavFileBetweenTimesStartAndEnd
 				(
 					soundAsWavFileSource,
@@ -598,13 +581,13 @@ function SoundEditor
 			);
 
 			srcElement.parentElement.removeChild(srcElement);
-		}	
+		}
 
 		this.divControlsFile.insertBefore
 		(
 			inputFileToLoad,
 			this.buttonTrackAdd.nextSibling
-		);	
+		);
 	}
 
 	SoundEditor.prototype.trackAdd_LoadComplete = function(wavFileLoaded)
@@ -618,7 +601,7 @@ function SoundEditor
 
 		var track = new Track
 		(
-			wavFileLoaded.filePath, 
+			wavFileLoaded.filePath,
 			[ sound ]
 		);
 
@@ -653,8 +636,8 @@ function SoundEditor
 		{
 			distanceToMoveInSeconds = this.viewSecondsPerPixel();
 		}
-			
-		var displacementInSeconds = 
+
+		var displacementInSeconds =
 			distanceToMoveInSeconds * direction;
 
 		this.viewOffsetInSeconds = NumberHelper.trimValueToRange
@@ -715,7 +698,7 @@ function SoundEditor
 		this.domElementUpdate_Cursor();
 		this.domElementUpdate_Selection();
 
-		return this.domElement;	
+		return this.domElement;
 	}
 
 	SoundEditor.prototype.domElementUpdate_BuildIfNecessary = function()

@@ -1,10 +1,10 @@
 
 function WavFileSamplingInfo
 (
-	name,	   
+	name,	
 	chunkSizeInBytes,
 	formatCode,
-	numberOfChannels,		
+	numberOfChannels,
 	samplesPerSecond,
 	bitsPerSample,
 	extraBytes
@@ -34,7 +34,7 @@ function WavFileSamplingInfo
 	}
 
 	WavFileSamplingInfo.prototype.bytesPerSecond = function()
-	{	
+	{
 		return this.samplesPerSecond
 			* this.numberOfChannels
 			* this.bitsPerSample / Constants.BitsPerByte;
@@ -52,5 +52,5 @@ function WavFileSamplingInfo
 			+ "/>";
 
 		return returnValue;
-	}		
+	}
 }

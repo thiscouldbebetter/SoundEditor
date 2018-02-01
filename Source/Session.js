@@ -27,7 +27,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 			{
 				trackEndInSecondsMax = trackEndInSeconds;
 			}
-		}	
+		}
 
 		return trackEndInSecondsMax;
 	}
@@ -42,7 +42,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 		return this.tracks[this.trackIndexCurrent];
 	}
 
-	// dom 
+	// dom
 
 	Session.prototype.domElementRemove = function()
 	{
@@ -51,5 +51,45 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 			var track = this.tracks[t];
 			track.domElementRemove();
 		}
+	}
+
+	// json
+
+	Session.fromStringJSON = function(sessionAsJSON)
+	{
+		var session = JSON.parse(sessionAsJSON);
+		session.__proto__ = Session.prototype;
+
+		var tracks = session.tracks;
+		for (var i = 0; i < tracks.length; i++)
+		{
+			var track = tracks[i];
+			track.__proto__ = Track.prototype;
+
+			var sounds = track.sounds;
+			for (var s = 0; s < sounds.length; s++)
+			{
+				var sound = sounds[s];
+				sound.__proto__ = Sound.prototype;
+
+				var wavFile = sound.sourceWavFile;
+				WavFile.objectPrototypesSet(wavFile);
+			}
+		}
+
+		var selections = session.selectionsTagged;
+		for (var i = 0; i < selections.length; i++)
+		{
+			var selection = selections[i];
+			selection.__proto__ = Selection.prototype;
+		}
+
+		return session;
+	}
+
+	Session.prototype.toStringJSON = function()
+	{
+		var returnValue = JSON.stringify(this);
+		return returnValue;
 	}
 }

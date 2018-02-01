@@ -25,7 +25,7 @@ function Selection(tag, timesStartAndEndInSeconds)
 		{
 			var timeAsString = startAndEndTimesAsStrings[i];
 			var timeComponentsHMS = timeAsString.split(":");
-		
+
 			// todo - handle minutes and hours
 
 			var timeComponentSeconds = timeComponentsHMS[2];
@@ -34,7 +34,7 @@ function Selection(tag, timesStartAndEndInSeconds)
 			var millisecondsAsString = secondsAndMillisecondsAsStrings[1];
 			var seconds = parseInt(secondsAsString);
 			var milliseconds = parseInt(millisecondsAsString);
-			
+
 			var timeInSeconds = seconds + (milliseconds / 1000);
 
 			startAndEndTimesInSeconds.push(timeInSeconds);
@@ -136,7 +136,7 @@ function Selection(tag, timesStartAndEndInSeconds)
 			this.timesStartAndEndInSeconds[1]
 		);
 
-		var returnValue = 
+		var returnValue =
 			timeStartAsString + "-" + timeEndAsString
 			+ " " + this.tag;
 
@@ -161,10 +161,10 @@ function Selection(tag, timesStartAndEndInSeconds)
 			this.timesStartAndEndInSeconds[1]
 		);
 
-		var returnValue = 
+		var returnValue =
 			indexAsString + newline
 			+ timeStartAsString
-			+ " --> " 
+			+ " --> "
 			+ timeEndAsString + newline
 			+ this.tag;
 

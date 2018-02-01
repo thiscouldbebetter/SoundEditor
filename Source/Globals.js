@@ -6,10 +6,10 @@ function Globals()
 
 	Globals.prototype.initialize = function(soundEditor)
 	{
-		this.soundEditor = soundEditor;	
+		this.soundEditor = soundEditor;
 
 		this.soundEditor.domElementUpdate();
-		
+
 		this.inputHelper = new InputHelper();
 		this.inputHelper.initialize();
 	}
