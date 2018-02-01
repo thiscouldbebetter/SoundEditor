@@ -7,7 +7,7 @@ function WavFileSample()
 {
 	// static methods
 
-	WavFileSample.buildManyFromBytes = function
+	WavFileSample.samplesForChannelsFromBytes = function
 	(
 		samplingInfo,
 		bytesToConvert
@@ -60,9 +60,9 @@ function WavFileSample()
 		return returnSamples;
 	}
 
-	WavFileSample.convertManyToBytes = function
+	WavFileSample.samplesForChannelsToBytes = function
 	(
-		samplesToConvert,
+		samplesForChannelsToConvert,
 		samplingInfo
 	)
 	{
@@ -70,7 +70,7 @@ function WavFileSample()
 
 		var numberOfChannels = samplingInfo.numberOfChannels;
 
-		var samplesPerChannel = samplesToConvert[0].length;
+		var samplesPerChannel = samplesForChannelsToConvert[0].length;
 
 		var bitsPerSample = samplingInfo.bitsPerSample;
 
@@ -91,7 +91,7 @@ function WavFileSample()
 		{
 			for (var c = 0; c < numberOfChannels; c++)
 			{
-				var sampleAsInteger = samplesToConvert[c][s];
+				var sampleAsInteger = samplesForChannelsToConvert[c][s];
 
 				var sampleAsBytes = byteConverter.integerToBytes
 				(

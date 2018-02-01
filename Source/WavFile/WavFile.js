@@ -91,7 +91,7 @@ function WavFile
 
 		var samplesForChannelsMixedAsBytes = reader.readBytes(subchunk2SizeInBytes);
 
-		var samplesForChannels = WavFileSample.buildManyFromBytes
+		var samplesForChannels = WavFileSample.samplesForChannelsFromBytes
 		(
 			this.samplingInfo,
 			samplesForChannelsMixedAsBytes
@@ -267,7 +267,7 @@ function WavFile
 	{
 		writer.writeString("data");
 
-		var samplesForChannelsMixedAsBytes = WavFileSample.convertManyToBytes
+		var samplesForChannelsMixedAsBytes = WavFileSample.samplesForChannelsToBytes
 		(
 			this.samplesForChannels,
 			this.samplingInfo
@@ -313,10 +313,20 @@ function WavFile
 
 		wavFile.samplingInfo.__proto__ = WavFileSamplingInfo.prototype;
 
-		var channels = wavFile.samplesForChannels;
-		for (var c = 0; c < channels.length; c++)
+		var samplesForChannelsAsBase64 = wavFile.samplesForChannels;
+		var samplesForChannelsAsBytes = Base64Encoder.stringBase64ToBytes
+		(
+			samplesForChannelsAsBase64
+		);
+		var samplesForChannels = WavFileSample.samplesForChannelsFromBytes
+		(
+			wavFile.samplingInfo,
+			samplesForChannelsAsBytes
+		);
+
+		for (var c = 0; c < samplesForChannels.length; c++)
 		{
-			var samplesForChannel = channels[c];
+			var samplesForChannel = samplesForChannels[c];
 
 			for (var s = 0; s < samplesForChannel.length; s++)
 			{
@@ -325,12 +335,29 @@ function WavFile
 			}
 		}
 
+		wavFile.samplesForChannels = samplesForChannels;
+
 		return wavFile;
 	}
 
 	WavFile.prototype.toStringJSON = function()
 	{
+		var samplesForChannelsToRestore = this.samplesForChannels;
+
+		var samplesForChannelsAsBytes = WavFileSample.samplesForChannelsToBytes
+		(
+			this.samplesForChannels, this.samplingInfo
+		);
+
+		var samplesForChannelsAsBase64 = Base64Encoder.bytesToStringBase64
+		(
+			samplesForChannelsAsBytes
+		);
+
+		this.samplesForChannels = samplesForChannelsAsBase64;
 		var returnValue = JSON.stringify(this);
+		this.samplesForChannels = samplesForChannelsToRestore;
+
 		return returnValue;
 	}
 }

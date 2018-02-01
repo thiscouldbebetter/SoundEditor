@@ -72,8 +72,9 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 				var sound = sounds[s];
 				sound.__proto__ = Sound.prototype;
 
-				var wavFile = sound.sourceWavFile;
-				WavFile.objectPrototypesSet(wavFile);
+				var sourceWavFileAsJSON = sound.sourceWavFile;
+				var sourceWavFile = WavFile.fromStringJSON(sourceWavFileAsJSON);
+				sound.sourceWavFile = sourceWavFile;
 			}
 		}
 
@@ -89,7 +90,38 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 
 	Session.prototype.toStringJSON = function()
 	{
-		var returnValue = JSON.stringify(this);
+		var wavFilesToRestore = [];
+
+		var tracks = this.tracks;
+		for (var i = 0; i < tracks.length; i++)
+		{
+			var track = tracks[i];
+			var sounds = track.sounds;
+			for (var s = 0; s < sounds.length; s++)
+			{
+				var sound = sounds[s];
+				var wavFile = sound.sourceWavFile;
+				wavFilesToRestore.push(wavFile);
+				var wavFileAsStringJSON = wavFile.toStringJSON();
+				sound.sourceWavFile = wavFileAsStringJSON;
+			}
+		}
+
+		var returnValue = JSON.stringify(this, null, 4);
+
+		for (var i = 0; i < tracks.length; i++)
+		{
+			var track = tracks[i];
+			var sounds = track.sounds;
+			for (var s = 0; s < sounds.length; s++)
+			{
+				var sound = sounds[s];
+				var wavFileToRestore = wavFilesToRestore[0];
+				wavFilesToRestore.splice(0, 1);
+				sound.sourceWavFile = wavFileToRestore;
+			}
+		}
+
 		return returnValue;
 	}
 }
