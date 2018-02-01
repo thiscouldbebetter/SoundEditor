@@ -51,9 +51,11 @@ function SoundEditor
 
 		var displacementInSeconds = distanceToMoveInSeconds * direction;
 
-		this.cursorOffsetInSeconds = NumberHelper.trimValueToRange
+		this.cursorOffsetInSeconds =
 		(
-			this.cursorOffsetInSeconds + displacementInSeconds,
+			this.cursorOffsetInSeconds + displacementInSeconds
+		).trimToRange
+		(
 			this.session.durationInSeconds()
 		);
 
@@ -311,9 +313,11 @@ function SoundEditor
 		var timeIndexStartOrEnd = (direction < 0 ? 0 : 1);
 		var timesStartAndEndInSeconds = this.selectionCurrent.timesStartAndEndInSeconds;
 
-		timesStartAndEndInSeconds[timeIndexStartOrEnd] = NumberHelper.trimValueToRange
+		timesStartAndEndInSeconds[timeIndexStartOrEnd] =
 		(
-			timesStartAndEndInSeconds[timeIndexStartOrEnd] + displacementInSeconds,
+			timesStartAndEndInSeconds[timeIndexStartOrEnd] + displacementInSeconds
+		).trimToRange
+		(
 			this.session.durationInSeconds()
 		);
 
@@ -640,9 +644,11 @@ function SoundEditor
 		var displacementInSeconds =
 			distanceToMoveInSeconds * direction;
 
-		this.viewOffsetInSeconds = NumberHelper.trimValueToRange
+		this.viewOffsetInSeconds =
 		(
-			this.viewOffsetInSeconds + displacementInSeconds,
+			this.viewOffsetInSeconds + displacementInSeconds
+		).trimToRange
+		(
 			this.session.durationInSeconds() - this.viewWidthInSeconds
 		);
 
@@ -1118,33 +1124,37 @@ function SoundEditor
 
 	SoundEditor.prototype.handleEventKeyDown = function(event)
 	{
-		var keyCode = event.keyCode;
+		var key = event.key;
 
-		if (keyCode == 37) // left
+		if (key == "ArrowLeft")
 		{
 			this.handleEventKeyDown_ArrowLeftOrRight(event, -1);
 		}
-		else if (keyCode == 38) // up
+		else if (key == "ArrowUp")
 		{
-			this.trackIndexCurrent = NumberHelper.trimValueToRange
+			this.trackIndexCurrent =
 			(
-				this.trackIndexCurrent - 1,
-				this.tracks.length
+				this.trackIndexCurrent - 1
+			).trimToRange
+			(
+				this.session.tracks.length
 			);
 		}
-		else if (keyCode == 39) // right
+		else if (key == "ArrowRight")
 		{
 			this.handleEventKeyDown_ArrowLeftOrRight(event, 1);
 		}
-		else if (keyCode == 40) // down
+		else if (key == "ArrowDown")
 		{
-			this.trackIndexCurrent = NumberHelper.trimValueToRange
+			this.trackIndexCurrent =
 			(
-				this.trackIndexCurrent + 1,
-				this.tracks.length
+				this.trackIndexCurrent + 1
+			).trimToRange
+			(
+				this.session.tracks.length
 			);
 		}
-		else if (keyCode == 65) // a
+		else if (key == "a")
 		{
 			// todo - contingent event.preventDefault();
 

@@ -11,20 +11,27 @@ function TimeHelper()
 
 	TimeHelper.secondsToStringHHMMSSmmm = function(secondsTotal)
 	{
-		var minutesTotal = Math.floor(secondsTotal / TimeHelper.SecondsPerMinute);
-		var minutesPastHour = minutesTotal % TimeHelper.MinutesPerHour;
-		var hours = Math.floor(minutesTotal / TimeHelper.MinutesPerHour);
-		var secondsPastMinute = Math.floor(secondsTotal % TimeHelper.SecondsPerMinute);
+		var minutesTotal =
+			Math.floor(secondsTotal / TimeHelper.SecondsPerMinute);
+		var minutesPastHour =
+			minutesTotal % TimeHelper.MinutesPerHour;
+		var hours =
+			Math.floor(minutesTotal / TimeHelper.MinutesPerHour);
+		var secondsPastMinute =
+			Math.floor(secondsTotal % TimeHelper.SecondsPerMinute);
 		var millisecondsPastSecond = Math.floor
 		(
 			(secondsTotal * TimeHelper.MillisecondsPerSecond)
 			% TimeHelper.MillisecondsPerSecond
 		);
 
-		var hoursPadded = StringHelper.padLeft("" + hours, "0", 2);
-		var minutesPastHourPadded = StringHelper.padLeft("" + minutesPastHour, "0", 2);
-		var secondsPastMinutePadded = StringHelper.padLeft("" + secondsPastMinute, "0", 2);
-		var millisecondsPastSecondPadded = StringHelper.padLeft("" + millisecondsPastSecond, "0", 3);
+		var hoursPadded = ("" + hours).padLeft("0", 2);
+		var minutesPastHourPadded =
+			("" + minutesPastHour).padLeft("0", 2);
+		var secondsPastMinutePadded =
+			("" + secondsPastMinute).padLeft("0", 2);
+		var millisecondsPastSecondPadded =
+			("" + millisecondsPastSecond).padLeft("0", 3);
 
 		var returnValue =
 			hoursPadded + ":"
@@ -45,10 +52,8 @@ function TimeHelper()
 			% TimeHelper.MillisecondsPerSecond
 		);
 
-		var millisecondsPastSecondPadded = StringHelper.padLeft
-		(
-			"" + millisecondsPastSecond, "0", 3
-		);
+		var millisecondsPastSecondPadded =
+			("" + millisecondsPastSecond).padLeft("0", 3);
 
 		var returnValue =
 			+ secondsWhole + "."

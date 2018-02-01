@@ -1,12 +1,14 @@
 
-function NumberHelper()
+function NumberExtensions()
 {
-	// static class
+	// Extension class.
 }
 
 {
-	NumberHelper.trimValueToRange = function(value, range)
+	Number.prototype.trimToRange = function(range)
 	{
+		var value = this;
+		
 		if (value < 0)
 		{
 			value = 0;
