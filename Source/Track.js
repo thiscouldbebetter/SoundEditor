@@ -51,7 +51,7 @@ function Track(name, sounds)
 
 		this.domElementUpdate_Cursor(soundEditor);
 
-		this.domElementUpdate_ViewTimeStart(soundEditor);
+		this.domElementUpdate_ViewTimeRange(soundEditor);
 
 		this.domElementUpdate_Title(viewSizeInPixels);
 
@@ -275,19 +275,39 @@ function Track(name, sounds)
 		);
 	}
 
-	Track.prototype.domElementUpdate_ViewTimeStart = function(soundEditor)
+	Track.prototype.domElementUpdate_ViewTimeRange = function(soundEditor)
 	{
-		var viewSizeInPixels = soundEditor.viewSizeInPixels;
-
-		var viewOffsetInSeconds = Math.floor
+		var viewMinInSeconds = Math.floor
 		(
 			soundEditor.viewOffsetInSeconds * 1000
 		) / 1000 + "";
 
+		var viewMaxInSeconds = Math.floor
+		(
+			(
+				soundEditor.viewOffsetInSeconds
+				+ soundEditor.viewWidthInSeconds
+			) * 1000
+		) / 1000 + "";
+
+		var textHeightInPixels = SoundEditor.TextHeightInPixels;
+
 		this.display.drawText
 		(
-			viewOffsetInSeconds,
-			new Coords(0, SoundEditor.TextHeightInPixels),
+			viewMinInSeconds,
+			new Coords(0, textHeightInPixels),
+			SoundEditor.ColorViewText,
+			SoundEditor.ColorViewBackground
+		);
+
+		this.display.drawText
+		(
+			viewMaxInSeconds,
+			new Coords
+			(
+				soundEditor.viewSizeInPixels.x - (3 * textHeightInPixels),
+				textHeightInPixels
+			),
 			SoundEditor.ColorViewText,
 			SoundEditor.ColorViewBackground
 		);
