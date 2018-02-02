@@ -31,7 +31,7 @@ function Track(name, sounds)
 	Track.prototype.domElementRemove = function()
 	{
 		delete this.domElement;
-		delete this.display.graphics;
+		delete this.display;
 	}
 
 	Track.prototype.domElementUpdate = function(soundEditor)
@@ -305,7 +305,8 @@ function Track(name, sounds)
 			viewMaxInSeconds,
 			new Coords
 			(
-				soundEditor.viewSizeInPixels.x - (3 * textHeightInPixels),
+				soundEditor.viewSizeInPixels.x
+				- (viewMaxInSeconds.length * textHeightInPixels * .6),
 				textHeightInPixels
 			),
 			SoundEditor.ColorViewText,

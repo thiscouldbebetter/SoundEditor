@@ -201,7 +201,12 @@ function WavFile
 
 	WavFile.prototype.durationInSeconds = function()
 	{
-		return this.durationInSamples() / this.samplingInfo.samplesPerSecond;
+
+		var durationInSamples = this.durationInSamples();
+		var returnValue =
+			durationInSamples
+			/ this.samplingInfo.samplesPerSecond;
+		return returnValue;
 	}
 
 	WavFile.prototype.extendOrTrimSamples = function(numberOfSamplesToExtendOrTrimTo)

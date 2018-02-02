@@ -21,7 +21,7 @@ function WavFileSamplingInfo
 {
 	WavFileSamplingInfo.buildDefault = function()
 	{
-		return new WavFileSamplingInfo
+		var returnValue = new WavFileSamplingInfo
 		(
 			"Default",
 			16, // chunkSizeInBytes
@@ -31,6 +31,8 @@ function WavFileSamplingInfo
 			16, // bitsPerSample
 			null // extraBytes
 		);
+
+		return returnValue;
 	}
 
 	WavFileSamplingInfo.prototype.bytesPerSecond = function()
