@@ -35,22 +35,27 @@ function WavFile
 
 	// static methods
 
+	WavFile.fromBytes = function(bytes)
+	{
+		var returnValue = new WavFile();
+		var reader = new ByteStreamLittleEndian(bytes);
+		returnValue.readFromFile_ReadChunks(reader);
+		return returnValue;
+
+	}
+
 	WavFile.readFromFile = function(fileToReadFrom, callback)
 	{
-		var returnValue = new WavFile(fileToReadFrom.name, null, null);
-
 		var fileReader = new FileReader();
 		fileReader.onloadend = function(fileLoadedEvent)
 		{
 			if (fileLoadedEvent.target.readyState == FileReader.DONE)
 			{
 				var bytesFromFile = fileLoadedEvent.target.result;
-				var reader = new ByteStreamLittleEndian(bytesFromFile);
-
-				returnValue.readFromFile_ReadChunks(reader);
+				var returnValue = WavFile.fromBytes(bytesFromFile);
+				returnValue.filePath = fileToReadFrom.name;
+				callback(returnValue);
 			}
-
-			callback(returnValue);
 		}
 
 		fileReader.readAsBinaryString(fileToReadFrom);
@@ -225,16 +230,14 @@ function WavFile
 		this.samplesForChannels = samplesForChannelsNew;
 	}
 
-	WavFile.prototype.writeToBytes = function()
+	WavFile.prototype.toBytes = function()
 	{
 		var writer = new ByteStreamLittleEndian([]);
-
-		this.writeToBytes_WriteChunks(writer);
-
+		this.toBytes_WriteChunks(writer);
 		return writer.bytes;
 	}
 
-	WavFile.prototype.writeToBytes_WriteChunks = function(writer)
+	WavFile.prototype.toBytes_WriteChunks = function(writer)
 	{
 		writer.writeString("RIFF");
 
@@ -259,11 +262,11 @@ function WavFile
 
 		writer.writeString("WAVE");
 
-		this.writeToBytes_WriteChunks_Format(writer);
-		this.writeToBytes_WriteChunks_Data(writer);
+		this.toBytes_WriteChunks_Format(writer);
+		this.toBytes_WriteChunks_Data(writer);
 	}
 
-	WavFile.prototype.writeToBytes_WriteChunks_Data = function(writer)
+	WavFile.prototype.toBytes_WriteChunks_Data = function(writer)
 	{
 		writer.writeString("data");
 
@@ -278,7 +281,7 @@ function WavFile
 		writer.writeBytes(samplesForChannelsMixedAsBytes);
 	}
 
-	WavFile.prototype.writeToBytes_WriteChunks_Format = function(writer)
+	WavFile.prototype.toBytes_WriteChunks_Format = function(writer)
 	{
 		writer.writeString("fmt ");
 

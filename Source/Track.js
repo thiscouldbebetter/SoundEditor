@@ -49,6 +49,10 @@ function Track(name, sounds)
 
 		this.domElementUpdate_Selections(soundEditor);
 
+		this.domElementUpdate_Cursor(soundEditor);
+
+		this.domElementUpdate_ViewTimeStart(soundEditor);
+
 		this.domElementUpdate_Title(viewSizeInPixels);
 
 		return this.domElement;
@@ -89,6 +93,46 @@ function Track(name, sounds)
 		}
 	}
 
+	Track.prototype.domElementUpdate_Cursor = function(soundEditor)
+	{
+		var cursorPosInSeconds = Math.floor
+		(
+			soundEditor.cursorOffsetInSeconds * 1000
+		) / 1000;
+
+		var cursorPosInPixels =
+			(
+				cursorPosInSeconds
+				- soundEditor.viewOffsetInSeconds
+			)
+			* soundEditor.viewSizeInPixels.x
+			/ soundEditor.viewWidthInSeconds;
+
+		this.graphics.strokeStyle = SoundEditor.ColorViewCursor;
+		this.graphics.strokeRect
+		(
+			cursorPosInPixels, 0,
+			1, soundEditor.viewSizeInPixels.y
+		);
+
+		var cursorPosInSecondsAsString = "" + cursorPosInSeconds;
+
+		this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
+		this.graphics.strokeText
+		(
+			cursorPosInSecondsAsString,
+			cursorPosInPixels + 2, SoundEditor.TextHeightInPixels
+		);
+
+		this.graphics.fillStyle = SoundEditor.ColorViewCursor;
+		this.graphics.fillText
+		(
+			cursorPosInSecondsAsString,
+			cursorPosInPixels + 2, SoundEditor.TextHeightInPixels
+
+		);
+	}
+
 	Track.prototype.domElementUpdate_Selections = function(soundEditor)
 	{
 		var selectionsTagged = soundEditor.session.selectionsTagged;
@@ -105,21 +149,6 @@ function Track(name, sounds)
 		{
 			this.domElementUpdate_Selection(soundEditor, selectionCurrent);
 		}
-
-		var cursorPosInPixels =
-			(
-				soundEditor.cursorOffsetInSeconds
-				- soundEditor.viewOffsetInSeconds
-			)
-			* soundEditor.viewSizeInPixels.x
-			/ soundEditor.viewWidthInSeconds;
-
-		this.graphics.strokeStyle = SoundEditor.ColorViewCursor;
-		this.graphics.strokeRect
-		(
-			cursorPosInPixels, 0,
-			1, soundEditor.viewSizeInPixels.y
-		);
 
 		return this.domElement;
 	}
@@ -165,13 +194,25 @@ function Track(name, sounds)
 
 		if (selectionCurrent.tag != null)
 		{
-			this.graphics.fillStyle = SoundEditor.ColorViewText;
+			var selectionAsString = selectionCurrent.toString();
 
-			this.graphics.fillText
+			this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
+			this.graphics.strokeText
 			(
-				selectionCurrent.toString(),
+				selectionAsString,
 				selectionStartInPixels + 2,
 				SoundEditor.TextHeightInPixels
+
+			);
+
+
+			this.graphics.fillStyle = SoundEditor.ColorViewText;
+			this.graphics.fillText
+			(
+				selectionAsString,
+				selectionStartInPixels + 2,
+				SoundEditor.TextHeightInPixels
+
 			);
 		}
 	}
@@ -257,12 +298,45 @@ function Track(name, sounds)
 
 	Track.prototype.domElementUpdate_Title = function(viewSizeInPixels)
 	{
-		this.graphics.fillStyle = SoundEditor.ColorViewText;
+		this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
+		this.graphics.strokeText
+		(
+			this.name,
+			2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels
+ * .2
+		);
 
+		this.graphics.fillStyle = SoundEditor.ColorViewText;
 		this.graphics.fillText
 		(
 			this.name,
-			2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels * .2
+			2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels
+ * .2
+		);
+	}
+
+	Track.prototype.domElementUpdate_ViewTimeStart = function(soundEditor)
+	{
+		var viewSizeInPixels = soundEditor.viewSizeInPixels;
+
+		var viewOffsetInSeconds = Math.floor
+		(
+			soundEditor.viewOffsetInSeconds * 1000
+		) / 1000 + "";
+
+		this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
+		this.graphics.strokeText
+		(
+			viewOffsetInSeconds,
+			0, SoundEditor.TextHeightInPixels
+
+		);
+		this.graphics.fillStyle = SoundEditor.ColorViewText;
+		this.graphics.fillText
+		(
+			viewOffsetInSeconds,
+			0, SoundEditor.TextHeightInPixels
+
 		);
 	}
 

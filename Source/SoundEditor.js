@@ -209,7 +209,7 @@ function SoundEditor
 	{
 		var soundAsWavFile = soundToPlay.sourceWavFile;
 
-		var soundAsBytes = soundAsWavFile.writeToBytes();
+		var soundAsBytes = soundAsWavFile.toBytes();
 
 		var soundAsStringBase64 = Base64Encoder.bytesToStringBase64(soundAsBytes);
 
@@ -492,7 +492,7 @@ function SoundEditor
 
 		var soundToExport = this.tagsPlay_BuildSound(soundToSelectFrom);
 		var wavFileToExport = soundToExport.sourceWavFile;
-		var soundToExportAsBytes = wavFileToExport.writeToBytes();
+		var soundToExportAsBytes = wavFileToExport.toBytes();
 
 		var filename = this.session.tagsToPlay + ".wav";
 
