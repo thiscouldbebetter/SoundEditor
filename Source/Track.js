@@ -31,7 +31,7 @@ function Track(name, sounds)
 	Track.prototype.domElementRemove = function()
 	{
 		delete this.domElement;
-		delete this.graphics;
+		delete this.display.graphics;
 	}
 
 	Track.prototype.domElementUpdate = function(soundEditor)
@@ -60,21 +60,12 @@ function Track(name, sounds)
 
 	Track.prototype.domElementUpdate_Background = function(viewSizeInPixels)
 	{
-		this.graphics.fillStyle = SoundEditor.ColorViewBackground;
-		this.graphics.strokeStyle = SoundEditor.ColorViewBorder;
-		this.graphics.fillRect
+		this.display.drawRectangle
 		(
-			0,
-			0,
-			viewSizeInPixels.x,
-			viewSizeInPixels.y
-		);
-		this.graphics.strokeRect
-		(
-			0,
-			0,
-			viewSizeInPixels.x,
-			viewSizeInPixels.y
+			new Coords(0, 0),
+			viewSizeInPixels,
+			SoundEditor.ColorViewBackground,
+			SoundEditor.ColorViewBorder
 		);
 	}
 
@@ -82,23 +73,16 @@ function Track(name, sounds)
 	{
 		if (this.domElement == null)
 		{
-			var canvasView = document.createElement("canvas");
-			canvasView.width = viewSizeInPixels.x;
-			canvasView.height = viewSizeInPixels.y;
-
-			this.graphics = canvasView.getContext("2d");
-
-			this.domElement = canvasView;
+			this.display = new Display(viewSizeInPixels);
+			this.display.initialize();
+			this.domElement = this.display.canvas;
 			this.domElement.entity = this;
 		}
 	}
 
 	Track.prototype.domElementUpdate_Cursor = function(soundEditor)
 	{
-		var cursorPosInSeconds = Math.floor
-		(
-			soundEditor.cursorOffsetInSeconds * 1000
-		) / 1000;
+		var cursorPosInSeconds = soundEditor.cursorOffsetInSeconds;
 
 		var cursorPosInPixels =
 			(
@@ -108,28 +92,25 @@ function Track(name, sounds)
 			* soundEditor.viewSizeInPixels.x
 			/ soundEditor.viewWidthInSeconds;
 
-		this.graphics.strokeStyle = SoundEditor.ColorViewCursor;
-		this.graphics.strokeRect
+		this.display.drawRectangle
 		(
-			cursorPosInPixels, 0,
-			1, soundEditor.viewSizeInPixels.y
+			new Coords(cursorPosInPixels, 0),
+			new Coords(1, soundEditor.viewSizeInPixels.y),
+			SoundEditor.ColorViewCursor
 		);
 
 		var cursorPosInSecondsAsString = "" + cursorPosInSeconds;
 
-		this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
-		this.graphics.strokeText
+		this.display.drawText
 		(
 			cursorPosInSecondsAsString,
-			cursorPosInPixels + 2, SoundEditor.TextHeightInPixels
-		);
-
-		this.graphics.fillStyle = SoundEditor.ColorViewCursor;
-		this.graphics.fillText
-		(
-			cursorPosInSecondsAsString,
-			cursorPosInPixels + 2, SoundEditor.TextHeightInPixels
-
+			new Coords
+			(
+				cursorPosInPixels + 2,
+				SoundEditor.TextHeightInPixels
+			),
+			SoundEditor.ColorViewCursor,
+			SoundEditor.ColorViewBackground
 		);
 	}
 
@@ -177,42 +158,28 @@ function Track(name, sounds)
 			selectionDurationInSeconds
 			/ secondsPerPixel;
 
-		this.graphics.fillStyle = SoundEditor.ColorViewSelectionFill;
-		this.graphics.strokeStyle = SoundEditor.ColorViewSelectionBorder;
-
-		this.graphics.fillRect
+		this.display.drawRectangle
 		(
-			selectionStartInPixels, 0,
-			selectionSizeInPixels, viewSizeInPixels.y
-		);
-
-		this.graphics.strokeRect
-		(
-			selectionStartInPixels, 0,
-			selectionSizeInPixels, viewSizeInPixels.y
+			new Coords(selectionStartInPixels, 0),
+			new Coords(selectionSizeInPixels, viewSizeInPixels.y),
+			SoundEditor.ColorViewSelectionFill,
+			SoundEditor.ColorViewSelectionBorder
 		);
 
 		if (selectionCurrent.tag != null)
 		{
 			var selectionAsString = selectionCurrent.toString();
 
-			this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
-			this.graphics.strokeText
+			this.display.drawText
 			(
 				selectionAsString,
-				selectionStartInPixels + 2,
-				SoundEditor.TextHeightInPixels
-
-			);
-
-
-			this.graphics.fillStyle = SoundEditor.ColorViewText;
-			this.graphics.fillText
-			(
-				selectionAsString,
-				selectionStartInPixels + 2,
-				SoundEditor.TextHeightInPixels
-
+				new Coords
+				(
+					selectionStartInPixels + 2,
+					SoundEditor.TextHeightInPixels
+				),
+				SoundEditor.ColorViewText,
+				SoundEditor.ColorViewBackground
 			);
 		}
 	}
@@ -239,7 +206,7 @@ function Track(name, sounds)
 		var samplePosInPixels = new Coords(0, viewSizeInPixelsHalf.y);
 		var sampleValue = 0;
 
-		this.graphics.beginPath();
+		this.display.graphics.beginPath();
 
 		var byteConverter = new ByteConverter(bitsPerSample);
 
@@ -277,7 +244,7 @@ function Track(name, sounds)
 							* .8 // max amplitude
 						);
 
-					this.graphics.lineTo
+					this.display.graphics.lineTo
 					(
 						samplePosInPixels.x,
 						samplePosInPixels.y
@@ -286,32 +253,25 @@ function Track(name, sounds)
 			}
 		}
 
-		this.graphics.stroke();
+		this.display.graphics.stroke();
 
-		this.graphics.strokeStyle = SoundEditor.ColorViewBaseline;
-		this.graphics.strokeRect
+		this.display.drawRectangle
 		(
-			0, soundEditor.viewSizeInPixelsHalf.y,
-			viewSizeInPixels.x, viewSizeInPixelsHalf.y
+			new Coords(0, soundEditor.viewSizeInPixelsHalf.y),
+			viewSizeInPixels,
+			null, // colorFill
+			SoundEditor.ColorViewBaseline
 		);
 	}
 
 	Track.prototype.domElementUpdate_Title = function(viewSizeInPixels)
 	{
-		this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
-		this.graphics.strokeText
+		this.display.drawRectangle
 		(
 			this.name,
-			2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels
- * .2
-		);
-
-		this.graphics.fillStyle = SoundEditor.ColorViewText;
-		this.graphics.fillText
-		(
-			this.name,
-			2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels
- * .2
+			new Coords(2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels * .2),
+			SoundEditor.ColorViewText,
+			SoundEditor.ColorViewBackground
 		);
 	}
 
@@ -324,19 +284,12 @@ function Track(name, sounds)
 			soundEditor.viewOffsetInSeconds * 1000
 		) / 1000 + "";
 
-		this.graphics.strokeStyle = SoundEditor.ColorViewBackground;
-		this.graphics.strokeText
+		this.display.drawText
 		(
 			viewOffsetInSeconds,
-			0, SoundEditor.TextHeightInPixels
-
-		);
-		this.graphics.fillStyle = SoundEditor.ColorViewText;
-		this.graphics.fillText
-		(
-			viewOffsetInSeconds,
-			0, SoundEditor.TextHeightInPixels
-
+			new Coords(0, SoundEditor.TextHeightInPixels),
+			SoundEditor.ColorViewText,
+			SoundEditor.ColorViewBackground
 		);
 	}
 
