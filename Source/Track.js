@@ -186,82 +186,95 @@ function Track(name, sounds)
 
 	Track.prototype.domElementUpdate_Sound = function(soundEditor, sound)
 	{
-		var soundSource = sound.sourceWavFile;
-		var samplingInfo = soundSource.samplingInfo;
-		var bitsPerSample = samplingInfo.bitsPerSample;
-		var samplesPerSecond = samplingInfo.samplesPerSecond; // hack
-		var samples = soundSource.samplesForChannels[0]; // hack
-
-		var soundOffsetWithinTrackInSamples = Math.round
-		(
-			sound.offsetWithinTrackInSeconds
-			* samplesPerSecond
-		);
-
-		var viewSizeInPixels = soundEditor.viewSizeInPixels;
-		var viewSizeInPixelsHalf = soundEditor.viewSizeInPixelsHalf;
-
-		var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
-		var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
-		var samplePosInPixels = new Coords(0, viewSizeInPixelsHalf.y);
-		var sampleValue = 0;
-
-		this.display.graphics.beginPath();
-
-		var byteConverter = new ByteConverter(bitsPerSample);
-
-		for (var i = 0; i < viewWidthInSamples; i++)
+		if (soundEditor.hasViewBeenUpdated == true)
 		{
-			var sampleIndex =
-				i
-				+ viewOffsetInSamples
-				- soundOffsetWithinTrackInSamples;
+			soundEditor.hasViewBeenUpdated = false;
 
-			if (sampleIndex >= 0 && sampleIndex <= samples.length)
+			var soundSource = sound.sourceWavFile;
+			var samplingInfo = soundSource.samplingInfo;
+			var bitsPerSample = samplingInfo.bitsPerSample;
+			var samplesPerSecond = samplingInfo.samplesPerSecond; // hack
+			var samples = soundSource.samplesForChannels[0]; // hack
+
+			var soundOffsetWithinTrackInSamples = Math.round
+			(
+				sound.offsetWithinTrackInSeconds
+				* samplesPerSecond
+			);
+
+			var viewSizeInPixels = soundEditor.viewSizeInPixels;
+			var viewSizeInPixelsHalf = soundEditor.viewSizeInPixelsHalf;
+
+			var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
+			var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
+			var samplePosInPixels = new Coords(0, viewSizeInPixelsHalf.y);
+			var sampleValue = 0;
+
+			this.displayForSound = new Display(this.display.size);
+			this.displayForSound.initialize();
+			this.displayForSound.graphics.beginPath();
+
+			var byteConverter = new ByteConverter(bitsPerSample);
+
+			for (var i = 0; i < viewWidthInSamples; i++)
 			{
-				var samplePosInPixelsXNext =
+				var sampleIndex =
 					i
-					* viewSizeInPixels.x
-					/ viewWidthInSamples;
+					+ viewOffsetInSamples
+					- soundOffsetWithinTrackInSamples;
 
-				if (samplePosInPixelsXNext != samplePosInPixels.x)
+				if (sampleIndex < 0 || sampleIndex >= samples.length)
 				{
-					var sampleBytes = samples[sampleIndex];
+					throw "Error!";
+				}
+				else
+				{
+					var samplePosInPixelsXNext =
+						i
+						* viewSizeInPixels.x
+						/ viewWidthInSamples;
 
-					sampleValue = byteConverter.integerToFloat
-					(
-						sampleBytes
-					);
+					if (samplePosInPixelsXNext != samplePosInPixels.x)
+					{
+						var sampleBytes = samples[sampleIndex];
 
-					samplePosInPixels.x = samplePosInPixelsXNext;
-
-					samplePosInPixels.y =
-						viewSizeInPixelsHalf.y
-						+
+						sampleValue = byteConverter.integerToFloat
 						(
-							sampleValue
-							* viewSizeInPixelsHalf.y
-							* .8 // max amplitude
+							sampleBytes
 						);
 
-					this.display.graphics.lineTo
-					(
-						samplePosInPixels.x,
-						samplePosInPixels.y
-					);
+						samplePosInPixels.x = samplePosInPixelsXNext;
+
+						samplePosInPixels.y =
+							viewSizeInPixelsHalf.y
+							+
+							(
+								sampleValue
+								* viewSizeInPixelsHalf.y
+								* .8 // max amplitude
+							);
+
+						this.displayForSound.graphics.lineTo
+						(
+							samplePosInPixels.x,
+							samplePosInPixels.y
+						);
+					}
 				}
 			}
+
+			this.displayForSound.graphics.stroke();
+
+			this.displayForSound.drawRectangle
+			(
+				new Coords(0, soundEditor.viewSizeInPixelsHalf.y),
+				viewSizeInPixels,
+				null, // colorFill
+				SoundEditor.ColorViewBaseline
+			);
 		}
 
-		this.display.graphics.stroke();
-
-		this.display.drawRectangle
-		(
-			new Coords(0, soundEditor.viewSizeInPixelsHalf.y),
-			viewSizeInPixels,
-			null, // colorFill
-			SoundEditor.ColorViewBaseline
-		);
+		this.display.drawImage(this.displayForSound.canvas, new Coords(0, 0));
 	}
 
 	Track.prototype.domElementUpdate_Title = function(viewSizeInPixels)

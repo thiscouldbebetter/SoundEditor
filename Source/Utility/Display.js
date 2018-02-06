@@ -13,6 +13,11 @@ function Display(size)
 		this.graphics = this.canvas.getContext("2d");
 	}
 
+	Display.prototype.drawImage = function(image, pos)
+	{
+		this.graphics.drawImage(image, pos.x, pos.y);
+	}
+
 	Display.prototype.drawRectangle = function(pos, size, colorFill, colorBorder)
 	{
 		if (colorFill != null)

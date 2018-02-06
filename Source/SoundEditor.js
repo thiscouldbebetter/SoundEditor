@@ -578,12 +578,11 @@ function SoundEditor
 		{
 			var srcElement = event.srcElement;
 			var fileToLoad = srcElement.files[0];
-			var wavFileLoaded = WavFile.readFromFile
+			FileHelper.loadFileAsBytes
 			(
 				fileToLoad,
 				callback
 			);
-
 			srcElement.parentElement.removeChild(srcElement);
 		}
 
@@ -594,8 +593,9 @@ function SoundEditor
 		);
 	}
 
-	SoundEditor.prototype.trackAdd_LoadComplete = function(wavFileLoaded)
+	SoundEditor.prototype.trackAdd_LoadComplete = function(wavFileName, wavFileAsBytes)
 	{
+		var wavFileLoaded = WavFile.fromBytes(wavFileName, wavFileAsBytes);
 		var sound = new Sound
 		(
 			wavFileLoaded.filePath,
@@ -652,6 +652,8 @@ function SoundEditor
 			this.session.durationInSeconds() - this.viewWidthInSeconds
 		);
 
+		this.hasViewBeenUpdated = true;
+
 		this.domElementUpdate();
 	}
 
@@ -659,6 +661,7 @@ function SoundEditor
 	{
 		this.viewOffsetInSeconds = 0;
 		this.viewWidthInSeconds = this.session.durationInSeconds();
+		this.hasViewBeenUpdated = true;
 		this.domElementUpdate();
 	}
 
@@ -677,6 +680,7 @@ function SoundEditor
 				this.viewWidthInSeconds = selectionDurationInSeconds;
 
 				this.selectionCurrent = null;
+				this.hasViewBeenUpdated = true;
 
 				this.domElementUpdate();
 			}

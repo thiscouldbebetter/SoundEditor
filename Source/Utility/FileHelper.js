@@ -5,20 +5,32 @@ function FileHelper()
 }
 
 {
-	FileHelper.destroyClickedElement = function(event)
-	{
-		event.target.parentElement.removeChild(event.target);
-	}
-
 	FileHelper.loadFileAsText = function(fileToLoad, callback)
 	{
 		var fileReader = new FileReader();
 		fileReader.onload = function(fileLoadedEvent)
 		{
 			var textFromFileLoaded = fileLoadedEvent.target.result;
-			callback(textFromFileLoaded);
+			callback(fileToLoad, textFromFileLoaded);
 		};
 		fileReader.readAsText(fileToLoad, "UTF-8");
+	}
+
+	FileHelper.loadFileAsBytes = function(fileToLoad, callback)
+	{
+		var fileReader = new FileReader();
+		fileReader.onload = function(fileLoadedEvent)
+		{
+			var fileContentsAsBinaryString = fileLoadedEvent.target.result;
+			var fileContentsAsBytes = [];
+			for (var i = 0; i < fileContentsAsBinaryString.length; i++)
+			{
+				var byte = fileContentsAsBinaryString.charCodeAt(i);
+				fileContentsAsBytes.push(byte);
+			}
+			callback(fileToLoad, fileContentsAsBytes);
+		};
+		fileReader.readAsBinaryString(fileToLoad);
 	}
 
 	FileHelper.saveBytesToFile = function(bytesToSave, filenameToSaveTo)
@@ -34,7 +46,7 @@ function FileHelper()
 		var bytesAsBlob = new Blob
 		(
 			[ bytesAsArrayBuffer ],
-			{type:'application/type'}
+			{type:"application/type"}
 		);
 
 		var downloadLink = document.createElement("a");
