@@ -1,8 +1,8 @@
 
-function Sound(name, offsetWithinTrackInSeconds, sourceWavFile)
+function Sound(name, sourceWavFile, offsetInSeconds)
 {
 	this.name = name;
-	this.offsetWithinTrackInSeconds = offsetWithinTrackInSeconds;
+	this.offsetInSeconds = (offsetInSeconds || 0);
 	this.sourceWavFile = sourceWavFile;
 }
 

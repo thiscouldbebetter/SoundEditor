@@ -168,31 +168,14 @@ function SoundEditor
 			var timeStartInSeconds = selection.timeStartInSeconds;
 			var timeEndInSeconds = selection.timeEndInSeconds;
 
-			var numberOfChannels = soundSource.samplesForChannels.length;
-			var samplesForChannels = [];
-			for (var i = 0; i < numberOfChannels; i++)
-			{
-				samplesForChannels.push([]);
-			}
-
-			selectionAsWavFile = new WavFile
+			var selectionAsWavFile = soundSource.clipBetweenTimes
 			(
-				soundSource.filePath,
-				soundSource.samplingInfo,
-				samplesForChannels
-			);
-
-			selectionAsWavFile.appendClipFromWavFileBetweenTimesStartAndEnd
-			(
-				soundSource,
-				timeStartInSeconds,
-				timeEndInSeconds
+				timeStartInSeconds, timeEndInSeconds
 			);
 
 			soundToPlay = new Sound
 			(
 				"[current selection]",
-				0, // offsetWithinTrackInSeconds,
 				selectionAsWavFile
 			);
 		}
@@ -544,7 +527,6 @@ function SoundEditor
 		var returnValue = new Sound
 		(
 			"[tags]",
-			0, // offsetFromTrackStartInSeconds
 			soundAsWavFileTarget
 		);
 
@@ -581,7 +563,6 @@ function SoundEditor
 		var sound = new Sound
 		(
 			wavFileLoaded.filePath,
-			0, // offsetWithinTrackInSeconds
 			wavFileLoaded
 		);
 

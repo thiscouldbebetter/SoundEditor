@@ -14,7 +14,7 @@ function Track(name, sounds)
 		{
 			var sound = this.sounds[i];
 			var soundEndInSeconds =
-				sound.offsetWithinTrackInSeconds
+				sound.offsetInSeconds
 				+ sound.durationInSeconds();
 
 			if (soundEndInSeconds > soundEndInSecondsMax)
@@ -194,10 +194,9 @@ function Track(name, sounds)
 			var samplesPerSecond = samplingInfo.samplesPerSecond; // hack
 			var samples = soundSource.samplesForChannels[0]; // hack
 
-			var soundOffsetWithinTrackInSamples = Math.round
+			var soundOffsetInSamples = Math.round
 			(
-				sound.offsetWithinTrackInSeconds
-				* samplesPerSecond
+				sound.offsetInSeconds * samplesPerSecond
 			);
 
 			var viewSizeInPixels = soundEditor.viewSizeInPixels;
@@ -219,7 +218,7 @@ function Track(name, sounds)
 				var sampleIndex =
 					i
 					+ viewOffsetInSamples
-					- soundOffsetWithinTrackInSamples;
+					- soundOffsetInSamples;
 
 				if (sampleIndex < 0 || sampleIndex >= samples.length)
 				{
