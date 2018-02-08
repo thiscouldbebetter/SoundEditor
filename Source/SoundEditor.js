@@ -146,7 +146,7 @@ function SoundEditor
 
 	SoundEditor.prototype.play = function()
 	{
-		if (this.domElementAudio != null)
+		if (this.soundPlaying != null)
 		{
 			return;
 		}
@@ -196,35 +196,13 @@ function SoundEditor
 			);
 		}
 
-		this.playSound(soundToPlay);
+		this.soundPlaying = soundToPlay;
+		soundToPlay.play(this.play_PlaybackComplete);
 	}
 
 	SoundEditor.prototype.play_PlaybackComplete = function()
 	{
-		this.domElementAudio = null;
-	}
-
-	SoundEditor.prototype.playSound = function(soundToPlay)
-	{
-		var soundAsWavFile = soundToPlay.sourceWavFile;
-
-		var soundAsBytes = soundAsWavFile.toBytes();
-
-		var soundAsStringBase64 = Base64Encoder.bytesToStringBase64(soundAsBytes);
-
-		var soundAsDataURI = 'data:audio/wav;base64,' + soundAsStringBase64;
-
-		var domElementSoundSource = document.createElement("source");
-		domElementSoundSource.src = soundAsDataURI;
-
-		var domElementAudio = document.createElement("audio");
-		domElementAudio.autoplay = "autoplay";
-		domElementAudio.onended = this.play_PlaybackComplete.bind(this);
-
-		domElementAudio.appendChild(domElementSoundSource);
-
-		document.body.appendChild(domElementAudio);
-		this.domElementAudio = domElementAudio;
+		this.soundPlaying = null;
 	}
 
 	SoundEditor.prototype.record = function()
@@ -234,13 +212,10 @@ function SoundEditor
 
 	SoundEditor.prototype.stop = function()
 	{
-		if (this.domElementAudio != null)
+		if (this.soundPlaying != null)
 		{
-			this.domElementAudio.parentElement.removeChild
-			(
-				this.domElementAudio
-			);
-			this.domElementAudio = null;
+			this.soundPlaying.stop();
+			this.soundPlaying = null;
 		}
 	}
 
