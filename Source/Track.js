@@ -140,13 +140,11 @@ function Track(name, sounds)
 
 		var selectionDurationInSeconds = selectionCurrent.durationInSeconds();
 
-		var timesStartAndEndInSeconds = selectionCurrent.timesStartAndEndInSeconds;
+		var selection = selectionCurrent;
 		var timeStartInSecondsRelative =
-			timesStartAndEndInSeconds[0]
-			- soundEditor.viewOffsetInSeconds;
+			selection.timeStartInSeconds - soundEditor.viewOffsetInSeconds;
 		var timeEndInSecondsRelative =
-			timesStartAndEndInSeconds[1]
-			- soundEditor.viewOffsetInSeconds;
+			selection.timeEndInSeconds - soundEditor.viewOffsetInSeconds;
 
 		var secondsPerPixel = soundEditor.viewSecondsPerPixel();
 
@@ -341,9 +339,8 @@ function Track(name, sounds)
 		for (var i = 0; i < session.selectionsTagged.length; i++)
 		{
 			var selectionTagged = session.selectionsTagged[i];
-			var timesStartAndEndInSeconds = selectionTagged.timesStartAndEndInSeconds;
-			var timeStartInSeconds = timesStartAndEndInSeconds[0];
-			var timeEndInSeconds = timesStartAndEndInSeconds[1];
+			var timeStartInSeconds = selectionTagged.timeStartInSeconds;
+			var timeEndInSeconds = selectionTagged.timeEndInSeconds;
 
 			var isClickWithinSelection =
 			(
@@ -370,17 +367,15 @@ function Track(name, sounds)
 			soundEditor.selectionCurrent = new Selection
 			(
 				null, // tag
-				[
-					soundEditor.cursorOffsetInSeconds,
-					soundEditor.cursorOffsetInSeconds
-				]
+				soundEditor.cursorOffsetInSeconds,
+				soundEditor.cursorOffsetInSeconds
 			);
 		}
 
 		var mousePointerOffsetInSeconds = this.mousePointerOffsetInSecondsForEvent(event);
 
 		soundEditor.cursorOffsetInSeconds = mousePointerOffsetInSeconds;
-		soundEditor.selectionCurrent.timesStartAndEndInSeconds[1] = soundEditor.cursorOffsetInSeconds;
+		soundEditor.selectionCurrent.timeEndInSeconds = soundEditor.cursorOffsetInSeconds;
 		soundEditor.domElementUpdate();
 	}
 

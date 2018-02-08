@@ -1,8 +1,9 @@
 
-function Selection(tag, timesStartAndEndInSeconds)
+function Selection(tag, timeStartInSeconds, timeEndInSeconds)
 {
 	this.tag = tag;
-	this.timesStartAndEndInSeconds = timesStartAndEndInSeconds;
+	this.timeStartInSeconds = timeStartInSeconds;
+	this.timeEndInSeconds = timeEndInSeconds;
 }
 
 {
@@ -45,7 +46,8 @@ function Selection(tag, timesStartAndEndInSeconds)
 		var returnValue = new Selection
 		(
 			tag,
-			startAndEndTimesInSeconds
+			startAndEndTimesInSeconds[0],
+			startAndEndTimesInSeconds[1]
 		);
 
 		return returnValue;
@@ -106,21 +108,17 @@ function Selection(tag, timesStartAndEndInSeconds)
 
 	Selection.prototype.rectify = function()
 	{
-		var sampleIndexStart = this.timesStartAndEndInSeconds[0];
-		var sampleIndexEnd = this.timesStartAndEndInSeconds[1];
-
-		if (sampleIndexStart > sampleIndexEnd)
+		if (this.timeStartInSeconds > this.timeEndInSeconds)
 		{
-			this.timesStartAndEndInSeconds[0] = sampleIndexEnd;
-			this.timesStartAndEndInSeconds[1] = sampleIndexStart;
+			var temp = this.timeStartInSeconds;
+			this.timeStartInSeconds = this.timeEndInSeconds;
+			this.timeEndInSeconds = temp;
 		}
 	}
 
 	Selection.prototype.durationInSeconds = function()
 	{
-		var timeStartInSeconds = this.timesStartAndEndInSeconds[0];
-		var timeEndInSeconds = this.timesStartAndEndInSeconds[1];
-		var returnValue = timeEndInSeconds - timeStartInSeconds;
+		var returnValue = this.timeEndInSeconds - this.timeStartInSeconds;
 		return returnValue;
 	}
 
@@ -128,12 +126,12 @@ function Selection(tag, timesStartAndEndInSeconds)
 	{
 		var timeStartAsString = TimeHelper.secondsToStringSecondsMilliseconds
 		(
-			this.timesStartAndEndInSeconds[0]
+			this.timeStartInSeconds
 		);
 
 		var timeEndAsString = TimeHelper.secondsToStringSecondsMilliseconds
 		(
-			this.timesStartAndEndInSeconds[1]
+			this.timeEndInSeconds
 		);
 
 		var returnValue =
@@ -153,12 +151,12 @@ function Selection(tag, timesStartAndEndInSeconds)
 
 		var timeStartAsString = TimeHelper.secondsToStringHHMMSSmmm
 		(
-			this.timesStartAndEndInSeconds[0]
+			this.timeStartInSeconds
 		);
 
 		var timeEndAsString = TimeHelper.secondsToStringHHMMSSmmm
 		(
-			this.timesStartAndEndInSeconds[1]
+			this.timeEndInSeconds
 		);
 
 		var returnValue =

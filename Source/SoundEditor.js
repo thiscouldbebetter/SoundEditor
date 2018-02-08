@@ -97,10 +97,9 @@ function SoundEditor
 		var samplingInfo = soundSource.samplingInfo;
 		var samplesPerSecond = samplingInfo.samplesPerSecond;
 
-		var timesStartAndEndInSeconds = this.selectionCurrent.timesStartAndEndInSeconds;
-
-		var timeStartInSeconds = timesStartAndEndInSeconds[0];
-		var timeEndInSeconds = timesStartAndEndInSeconds[1];
+		var selection = this.selectionCurrent;
+		var timeStartInSeconds = selection.timeStartInSeconds;
+		var timeEndInSeconds = selection.timeEndInSeconds;
 
 		var timeStartInSamples = Math.round(samplesPerSecond * timeStartInSeconds);
 		var timeEndInSamples = Math.round(samplesPerSecond * timeEndInSeconds);
@@ -165,7 +164,9 @@ function SoundEditor
 		{
 			var soundSource = soundToPlay.sourceWavFile;
 
-			var timesStartAndEndInSeconds = this.selectionCurrent.timesStartAndEndInSeconds;
+			var selection = this.selectionCurrent;
+			var timeStartInSeconds = selection.timeStartInSeconds;
+			var timeEndInSeconds = selection.timeEndInSeconds;
 
 			var numberOfChannels = soundSource.samplesForChannels.length;
 			var samplesForChannels = [];
@@ -184,8 +185,8 @@ function SoundEditor
 			selectionAsWavFile.appendClipFromWavFileBetweenTimesStartAndEnd
 			(
 				soundSource,
-				timesStartAndEndInSeconds[0],
-				timesStartAndEndInSeconds[1]
+				timeStartInSeconds,
+				timeEndInSeconds
 			);
 
 			soundToPlay = new Sound
@@ -224,7 +225,7 @@ function SoundEditor
 		this.selectionCurrent = new Selection
 		(
 			null, // tag
-			[0, this.session.durationInSeconds()]
+			0, this.session.durationInSeconds()
 		);
 		this.viewZoomToFit();
 	}
@@ -270,10 +271,8 @@ function SoundEditor
 			this.selectionCurrent = new Selection
 			(
 				null, // tag
-				[
-					this.cursorOffsetInSeconds,
-					this.cursorOffsetInSeconds,
-				]
+				this.cursorOffsetInSeconds,
+				this.cursorOffsetInSeconds,
 			);
 		}
 
@@ -284,16 +283,26 @@ function SoundEditor
 
 		var displacementInSeconds = amountToResizeInSeconds * direction;
 
-		var timeIndexStartOrEnd = (direction < 0 ? 0 : 1);
-		var timesStartAndEndInSeconds = this.selectionCurrent.timesStartAndEndInSeconds;
-
-		timesStartAndEndInSeconds[timeIndexStartOrEnd] =
-		(
-			timesStartAndEndInSeconds[timeIndexStartOrEnd] + displacementInSeconds
-		).trimToRange
-		(
-			this.session.durationInSeconds()
-		);
+		if (direction < 0)
+		{
+			this.timeStartInSeconds =
+			(
+				this.timeStartInSeconds + displacementInSeconds
+			).trimToRange
+			(
+				this.session.durationInSeconds()
+			);
+		}
+		else
+		{
+			this.timeEndInSeconds =
+			(
+				this.timeEndInSeconds + displacementInSeconds
+			).trimToRange
+			(
+				this.session.durationInSeconds()
+			);
+		}
 
 		this.domElementUpdate();
 	}
@@ -491,7 +500,8 @@ function SoundEditor
 
 		var soundToPlay = this.tagsPlay_BuildSound(soundToSelectFrom);
 
-		this.playSound(soundToPlay);
+		this.soundPlaying = soundToPlay;
+		soundToPlay.play(this.play_PlaybackComplete);
 	}
 
 	SoundEditor.prototype.tagsPlay_BuildSound = function(soundToSelectFrom)
@@ -522,13 +532,11 @@ function SoundEditor
 
 			if (tag != null)
 			{
-				var timesStartAndEndInSeconds = tag.timesStartAndEndInSeconds;
-
 				soundAsWavFileTarget.appendClipFromWavFileBetweenTimesStartAndEnd
 				(
 					soundAsWavFileSource,
-					timesStartAndEndInSeconds[0],
-					timesStartAndEndInSeconds[1]
+					tag.timeStartInSeconds,
+					tag.timeEndInSeconds
 				);
 			}
 		}
@@ -646,9 +654,9 @@ function SoundEditor
 			var selectionDurationInSeconds = this.selectionCurrent.durationInSeconds();
 			if (selectionDurationInSeconds > 0)
 			{
-				var timesStartAndEndInSeconds = this.selectionCurrent.timesStartAndEndInSeconds;
-				var timeStartInSeconds = timesStartAndEndInSeconds[0];
-				var timeEndInSeconds = timesStartAndEndInSeconds[1];
+				var selection = this.selectionCurrent;
+				var timeStartInSeconds = selection.timeStartInSeconds;
+				var timeEndInSeconds = selection.timeEndInSeconds;
 
 				this.viewOffsetInSeconds = timeStartInSeconds;
 				this.viewWidthInSeconds = selectionDurationInSeconds;
@@ -1051,9 +1059,9 @@ function SoundEditor
 		}
 		else
 		{
-			var timesStartAndEndInSeconds = this.selectionCurrent.timesStartAndEndInSeconds;
-			var timeStartInSeconds = timesStartAndEndInSeconds[0];
-			var timeEndInSeconds = timesStartAndEndInSeconds[1];
+			var selection = this.selectionCurrent;
+			var timeStartInSeconds = selection.timeStartInSeconds;
+			var timeEndInSeconds = selection.timeEndInSeconds;
 
 			this.inputSelectionStartInSeconds.value = timeStartInSeconds;
 			this.inputSelectionEndInSeconds.value = timeEndInSeconds;
