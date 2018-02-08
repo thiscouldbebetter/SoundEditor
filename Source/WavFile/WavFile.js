@@ -482,7 +482,7 @@ function WavFileSamplingInfo
 	this.numberOfChannels = numberOfChannels;
 	this.samplesPerSecond = samplesPerSecond;
 	this.bitsPerSample = bitsPerSample;
-	this.extraBytes = extraBytes;
+	this.extraBytes = (extraBytes || []);
 }
 {
 	// constants
@@ -499,8 +499,7 @@ function WavFileSamplingInfo
 			1, // formatCode
 			1, // numberOfChannels
 			44100,	 // samplesPerSecond
-			16, // bitsPerSample
-			[] // extraBytes
+			16 // bitsPerSample
 		);
 
 		return returnValue;

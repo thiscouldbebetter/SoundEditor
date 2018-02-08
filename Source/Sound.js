@@ -33,14 +33,16 @@ function Sound(name, sourceWavFile, offsetInSeconds)
 		domElementAudio.onended = function()
 		{
 			sound.stop();
-			callback();
+			if (callback != null)
+			{
+				callback();
+			}
 		}
 
 		this.domElementAudio = domElementAudio;
 		domElementAudio.appendChild(domElementSoundSource);
 
 		document.body.appendChild(domElementAudio);
-
 	}
 
 	Sound.prototype.stop = function()
