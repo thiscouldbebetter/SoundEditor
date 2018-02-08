@@ -196,7 +196,6 @@ function SoundEditor
 			);
 		}
 
-
 		this.playSound(soundToPlay);
 	}
 
@@ -439,7 +438,7 @@ function SoundEditor
 		);
 	}
 
-	SoundEditor.prototype.sessionLoad_LoadComplete = function(textFromFile)
+	SoundEditor.prototype.sessionLoad_LoadComplete = function(file, textFromFile)
 	{
 		this.domElementRemove();
 
