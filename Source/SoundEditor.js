@@ -433,6 +433,21 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
+	SoundEditor.prototype.sessionExportAsWav = function()
+	{
+		alert("Not yet implemented!");
+		return;
+
+		this.domElementRemove();
+
+		var sessionAsWavFile = this.session.toWavFile();
+		var sessionAsWavFileBytes = sessionAsWavFile.toBytes();
+
+		FileHelper.saveBytesToFile(sessionAsWavFileBytes, this.session.name + ".wav");
+
+		this.domElementUpdate();
+	}
+
 	SoundEditor.prototype.sessionSave = function()
 	{
 		this.domElementRemove();
@@ -846,6 +861,11 @@ function SoundEditor
 		buttonSessionSave.innerHTML = "Save Session";
 		buttonSessionSave.onclick = this.sessionSave.bind(this);
 		divControlsFile.appendChild(buttonSessionSave);
+
+		var buttonSessionExportAsWAV = document.createElement("button");
+		buttonSessionExportAsWAV.innerHTML = "Export Session as WAV";
+		buttonSessionExportAsWAV.onclick = this.sessionExportAsWav.bind(this);
+		divControlsFile.appendChild(buttonSessionExportAsWAV);
 
 		var buttonTagsExport = document.createElement("button");
 		buttonTagsExport.innerHTML = "Export Tags";

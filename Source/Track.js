@@ -184,94 +184,115 @@ function Track(name, sounds)
 
 	Track.prototype.domElementUpdate_Sound = function(soundEditor, sound)
 	{
-		if (soundEditor.hasViewBeenUpdated == true)
+		if (soundEditor.hasViewBeenUpdated)
 		{
-			soundEditor.hasViewBeenUpdated = false;
-
-			var soundSource = sound.sourceWavFile;
-			var samplingInfo = soundSource.samplingInfo;
-			var bitsPerSample = samplingInfo.bitsPerSample;
-			var samplesPerSecond = samplingInfo.samplesPerSecond; // hack
-			var samples = soundSource.samplesForChannels[0]; // hack
-
-			var soundOffsetInSamples = Math.round
-			(
-				sound.offsetInSeconds * samplesPerSecond
-			);
-
-			var viewSizeInPixels = soundEditor.viewSizeInPixels;
-			var viewSizeInPixelsHalf = soundEditor.viewSizeInPixelsHalf;
-
-			var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
-			var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
-			var samplePosInPixels = new Coords(0, viewSizeInPixelsHalf.y);
-			var sampleValue = 0;
-
-			this.displayForSound = new Display(this.display.size);
-			this.displayForSound.initialize();
-			this.displayForSound.graphics.beginPath();
-
-			var byteConverter = new ByteConverter(bitsPerSample);
-
-			for (var i = 0; i < viewWidthInSamples; i++)
-			{
-				var sampleIndex =
-					i
-					+ viewOffsetInSamples
-					- soundOffsetInSamples;
-
-				if (sampleIndex < 0 || sampleIndex >= samples.length)
-				{
-					throw "Error!";
-				}
-				else
-				{
-					var samplePosInPixelsXNext =
-						i
-						* viewSizeInPixels.x
-						/ viewWidthInSamples;
-
-					if (samplePosInPixelsXNext != samplePosInPixels.x)
-					{
-						var sampleBytes = samples[sampleIndex];
-
-						sampleValue = byteConverter.integerToFloat
-						(
-							sampleBytes
-						);
-
-						samplePosInPixels.x = samplePosInPixelsXNext;
-
-						samplePosInPixels.y =
-							viewSizeInPixelsHalf.y
-							+
-							(
-								sampleValue
-								* viewSizeInPixelsHalf.y
-								* .8 // max amplitude
-							);
-
-						this.displayForSound.graphics.lineTo
-						(
-							samplePosInPixels.x,
-							samplePosInPixels.y
-						);
-					}
-				}
-			}
-
-			this.displayForSound.graphics.stroke();
-
-			this.displayForSound.drawRectangle
-			(
-				new Coords(0, soundEditor.viewSizeInPixelsHalf.y),
-				viewSizeInPixels,
-				null, // colorFill
-				SoundEditor.ColorViewBaseline
-			);
+			this.domElementUpdate_Sound_Refresh(soundEditor, sound);
 		}
 
 		this.display.drawImage(this.displayForSound.canvas, new Coords(0, 0));
+	}
+
+	Track.prototype.domElementUpdate_Sound_Refresh = function(soundEditor, sound)
+	{
+		soundEditor.hasViewBeenUpdated = false;
+
+		var soundSource = sound.sourceWavFile;
+		var samplingInfo = soundSource.samplingInfo;
+		var bitsPerSample = samplingInfo.bitsPerSample;
+		var samplesPerSecond = samplingInfo.samplesPerSecond; // hack
+		var samples = soundSource.samplesForChannels[0]; // hack
+
+		var soundOffsetInSamples = Math.round
+		(
+			sound.offsetInSeconds * samplesPerSecond
+		);
+
+		var viewSizeInPixels = soundEditor.viewSizeInPixels;
+		var viewWidthInPixels = viewSizeInPixels.x;
+		var viewHeightInPixelsHalf = soundEditor.viewSizeInPixelsHalf.y;
+
+		var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
+		var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
+		var samplePosInPixels = new Coords(0, viewHeightInPixelsHalf);
+		var sampleValue = 0;
+
+		this.displayForSound = new Display(this.display.size);
+		this.displayForSound.initialize();
+		this.displayForSound.graphics.beginPath();
+
+		var byteConverter = new ByteConverter(bitsPerSample);
+		
+		for (var i = 0; i < viewWidthInSamples; i++)
+		{
+			this.domElementUpdate_Sound_Refresh_Sample
+			(
+				viewOffsetInSamples, soundOffsetInSamples, samples,
+				viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples,
+				samplePosInPixels, byteConverter, i
+			);
+		}
+
+		this.displayForSound.graphics.stroke();
+
+		this.displayForSound.drawRectangle
+		(
+			new Coords(0, soundEditor.viewSizeInPixelsHalf.y),
+			viewSizeInPixels,
+			null, // colorFill
+			SoundEditor.ColorViewBaseline
+		);
+	}
+
+	Track.prototype.domElementUpdate_Sound_Refresh_Sample = function
+	(
+		viewOffsetInSamples, soundOffsetInSamples, samples,
+		viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples,
+		samplePosInPixels, byteConverter, i
+	)
+	{
+		var sampleIndex =
+			i
+			+ viewOffsetInSamples
+			- soundOffsetInSamples;
+
+		if (sampleIndex < 0 || sampleIndex >= samples.length)
+		{
+			throw "Error!";
+		}
+		else
+		{
+			var samplePosInPixelsXNext =
+				i
+				* viewWidthInPixels
+				/ viewWidthInSamples;
+
+			if (samplePosInPixelsXNext != samplePosInPixels.x)
+			{
+				var sampleBytes = samples[sampleIndex];
+
+				sampleValue = byteConverter.integerToFloat
+				(
+					sampleBytes
+				);
+
+				samplePosInPixels.x = samplePosInPixelsXNext;
+
+				samplePosInPixels.y =
+					viewHeightInPixelsHalf
+					+
+					(
+						sampleValue
+						* viewHeightInPixelsHalf
+						* .8 // max amplitude
+					);
+
+				this.displayForSound.graphics.lineTo
+				(
+					samplePosInPixels.x,
+					samplePosInPixels.y
+				);
+			}
+		}
 	}
 
 	Track.prototype.domElementUpdate_Title = function(viewSizeInPixels)
@@ -406,5 +427,12 @@ function Track(name, sounds)
 			+ soundEditor.viewOffsetInSeconds
 
 		return mousePointerOffsetInSeconds;
+	}
+
+	Track.prototype.toWavFile = function()
+	{
+		var soundToExport = this.sounds[0]; // todo - Combine.
+		var soundToExportAsWavFile = soundToExport.sourceWavFile; // todo - Transform.
+		return soundToExportAsWavFile;
 	}
 }

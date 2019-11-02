@@ -124,4 +124,13 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 
 		return returnValue;
 	}
+
+	// wav
+
+	Session.prototype.toWavFile = function()
+	{
+		var trackToExport = this.tracks[0]; // todo - Mix down.
+		var trackToExportAsWavFile = trackToExport.toWavFile();
+		return trackToExportAsWavFile;
+	}
 }
