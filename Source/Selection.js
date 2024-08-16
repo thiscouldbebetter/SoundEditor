@@ -1,15 +1,16 @@
 
-function Selection(tag, timeStartInSeconds, timeEndInSeconds)
+class Selection
 {
-	this.tag = tag;
-	this.timeStartInSeconds = timeStartInSeconds;
-	this.timeEndInSeconds = timeEndInSeconds;
-}
+	constructor(tag, timeStartInSeconds, timeEndInSeconds)
+	{
+		this.tag = tag;
+		this.timeStartInSeconds = timeStartInSeconds;
+		this.timeEndInSeconds = timeEndInSeconds;
+	}
 
-{
 	// static methods
 
-	Selection.buildFromStringSRT = function(selectionAsStringSRT)
+	static buildFromStringSRT(selectionAsStringSRT)
 	{
 		var newline = Constants.Newline;
 
@@ -53,7 +54,7 @@ function Selection(tag, timeStartInSeconds, timeEndInSeconds)
 		return returnValue;
 	}
 
-	Selection.buildManyFromStringSRT = function(selectionsAsStringSRT)
+	static buildManyFromStringSRT(selectionsAsStringSRT)
 	{
 		var returnValues = [];
 
@@ -81,7 +82,7 @@ function Selection(tag, timeStartInSeconds, timeEndInSeconds)
 		return returnValues;
 	}
 
-	Selection.convertManyToStringSRT = function(selections)
+	convertManyToStringSRT(selections)
 	{
 		var returnValue = "";
 
@@ -101,12 +102,12 @@ function Selection(tag, timeStartInSeconds, timeEndInSeconds)
 
 	// instance methods
 
-	Selection.prototype.overlapsWith = function(other)
+	overlapsWith(other)
 	{
 		return false; // todo
 	}
 
-	Selection.prototype.rectify = function()
+	rectify()
 	{
 		if (this.timeStartInSeconds > this.timeEndInSeconds)
 		{
@@ -116,13 +117,14 @@ function Selection(tag, timeStartInSeconds, timeEndInSeconds)
 		}
 	}
 
-	Selection.prototype.durationInSeconds = function()
+	durationInSeconds()
 	{
-		var returnValue = this.timeEndInSeconds - this.timeStartInSeconds;
+		var returnValue =
+			this.timeEndInSeconds - this.timeStartInSeconds;
 		return returnValue;
 	}
 
-	Selection.prototype.toString = function()
+	toString()
 	{
 		var timeStartAsString = TimeHelper.secondsToStringSecondsMilliseconds
 		(
@@ -141,7 +143,7 @@ function Selection(tag, timeStartInSeconds, timeEndInSeconds)
 		return returnValue;
 	}
 
-	Selection.prototype.toStringSRT = function(index)
+	toStringSRT(index)
 	{
 		// SubRip subtitle format
 

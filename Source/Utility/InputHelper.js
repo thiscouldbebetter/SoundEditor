@@ -1,23 +1,20 @@
 
-function InputHelper()
+class InputHelper
 {
+	static MouseDragDelayInMilliseconds = 100;
 
-}
-
-{
-	InputHelper.MouseDragDelayInMilliseconds = 100;
-
-	InputHelper.prototype.initialize = function()
+	initialize()
 	{
-		document.body.onmousedown = this.handleEventMouseDown.bind(this);
-		document.body.onmousemove = this.handleEventMouseMove.bind(this);
-		document.body.onmouseup = this.handleEventMouseUp.bind(this);
-		document.body.onkeydown = this.handleEventKeyDown.bind(this);
+		var body = document.body;
+		body.onmousedown = this.handleEventMouseDown.bind(this);
+		body.onmousemove = this.handleEventMouseMove.bind(this);
+		body.onmouseup = this.handleEventMouseUp.bind(this);
+		body.onkeydown = this.handleEventKeyDown.bind(this);
 	}
 
 	// events
 
-	InputHelper.prototype.handleEventKeyDown = function(event)
+	handleEventKeyDown(event)
 	{
 		this.keyEventPrev = event;
 
@@ -28,7 +25,7 @@ function InputHelper()
 		}
 	}
 
-	InputHelper.prototype.handleEventMouseDown = function(event)
+	handleEventMouseDown(event)
 	{
 		this.mouseButtonPressed = true;
 		this.mouseClickTime = new Date();
@@ -40,9 +37,9 @@ function InputHelper()
 		}
 	}
 
-	InputHelper.prototype.handleEventMouseMove = function(event)
+	handleEventMouseMove(event)
 	{
-		if (this.mouseButtonPressed == true)
+		if (this.mouseButtonPressed)
 		{
 			var now = new Date();
 			var millisecondsElapsedSinceClick = now - this.mouseClickTime;
@@ -57,7 +54,7 @@ function InputHelper()
 		}
 	}
 
-	InputHelper.prototype.handleEventMouseUp = function(event)
+	handleEventMouseUp(event)
 	{
 		this.mouseButtonPressed = false;
 

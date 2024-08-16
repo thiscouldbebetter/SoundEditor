@@ -1,10 +1,12 @@
 
-function Display(size)
+class Display
 {
-	this.size = size;
-}
-{
-	Display.prototype.initialize = function()
+	constructor(size)
+	{
+		this.size = size;
+	}
+
+	initialize()
 	{
 		this.canvas = document.createElement("canvas");
 		this.canvas.width = this.size.x;
@@ -13,32 +15,36 @@ function Display(size)
 		this.graphics = this.canvas.getContext("2d");
 	}
 
-	Display.prototype.drawImage = function(image, pos)
+	drawImage(image, pos)
 	{
 		this.graphics.drawImage(image, pos.x, pos.y);
 	}
 
-	Display.prototype.drawRectangle = function(pos, size, colorFill, colorBorder)
+	drawRectangle(pos, size, colorFill, colorBorder)
 	{
+		var g = this.graphics;
+
 		if (colorFill != null)
 		{
-			this.graphics.fillStyle = colorFill;
-			this.graphics.fillRect(pos.x, pos.y, size.x, size.y);
+			g.fillStyle = colorFill;
+			g.fillRect(pos.x, pos.y, size.x, size.y);
 		}
-		
+
 		if (colorBorder != null)
-		{			
-			this.graphics.strokeStyle = colorBorder;
-			this.graphics.strokeRect(pos.x, pos.y, size.x, size.y);
+		{
+			g.strokeStyle = colorBorder;
+			g.strokeRect(pos.x, pos.y, size.x, size.y);
 		}
 	}
-	
-	Display.prototype.drawText = function(text, pos, colorFill, colorBorder)
-	{
-		this.graphics.strokeStyle = colorBorder;
-		this.graphics.strokeText(text, pos.x, pos.y);
 
-		this.graphics.fillStyle = colorFill;
-		this.graphics.fillText(text, pos.x, pos.y);		
+	drawText(text, pos, colorFill, colorBorder)
+	{
+		var g = this.graphics;
+
+		g.strokeStyle = colorBorder;
+		g.strokeText(text, pos.x, pos.y);
+
+		g.fillStyle = colorFill;
+		g.fillText(text, pos.x, pos.y);
 	}
 }

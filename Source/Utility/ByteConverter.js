@@ -1,18 +1,19 @@
 
-function ByteConverter(numberOfBits)
+class ByteConverter
 {
-	this.numberOfBits = numberOfBits;
-	this.numberOfBytes = Math.floor(this.numberOfBits / 8);
+	constructor(numberOfBits)
+	{
+		this.numberOfBits = numberOfBits;
+		this.numberOfBytes = Math.floor(this.numberOfBits / 8);
 
-	this.maxValueSigned =
-		(1 << (numberOfBits - 1)) - 1;
+		this.maxValueSigned =
+			(1 << (numberOfBits - 1)) - 1;
 
-	this.maxValueUnsigned =
-		(1 << (numberOfBits));
-}
+		this.maxValueUnsigned =
+			(1 << (numberOfBits));
+	}
 
-{
-	ByteConverter.prototype.bytesToFloat = function(bytes)
+	bytesToFloat(bytes)
 	{
 		var bytesAsInteger = this.bytesToInteger(bytes);
 
@@ -22,7 +23,7 @@ function ByteConverter(numberOfBits)
 		return returnValue;
 	}
 
-	ByteConverter.prototype.bytesToInteger = function(bytes)
+	bytesToInteger(bytes)
 	{
 		var returnValue = 0;
 
@@ -41,12 +42,12 @@ function ByteConverter(numberOfBits)
 		return returnValue;
 	}
 
-	ByteConverter.prototype.floatToInteger = function(float)
+	floatToInteger(floatToConvert)
 	{
-		return float * this.maxValueSigned;
+		return floatToConvert * this.maxValueSigned;
 	}
 
-	ByteConverter.prototype.integerToBytes = function(integer)
+	integerToBytes(integer)
 	{
 		var returnValues = [];
 
@@ -59,7 +60,7 @@ function ByteConverter(numberOfBits)
 		return returnValues;
 	}
 
-	ByteConverter.prototype.integerToFloat = function(integer)
+	integerToFloat(integer)
 	{
 		var returnValue =
 			integer / this.maxValueSigned;

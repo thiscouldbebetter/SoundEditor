@@ -1,10 +1,9 @@
 
-function Globals()
-{}
+class Globals
 {
-	Globals.Instance = new Globals();
+	static Instance = new Globals();
 
-	Globals.prototype.initialize = function(soundEditor)
+	initialize(soundEditor)
 	{
 		this.soundEditor = soundEditor;
 

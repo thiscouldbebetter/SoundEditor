@@ -1,44 +1,46 @@
 
-function SoundEditor
-(
-	viewSizeInPixels,
-	session
-)
+class SoundEditor
 {
-	this.viewSizeInPixels = viewSizeInPixels;
-	this.session = session;
-
-	if (this.session == null)
+	constructor
+	(
+		viewSizeInPixels,
+		session
+	)
 	{
-		this.sessionNew();
+		this.viewSizeInPixels = viewSizeInPixels;
+		this.session = session;
+
+		if (this.session == null)
+		{
+			this.sessionNew();
+
+		}
+
+		this.viewSizeInPixelsHalf =
+			this.viewSizeInPixels.clone().divideScalar(2);
+
+		this.selectionCurrent = null;
+		this.cursorOffsetInSeconds = 0;
+		this.viewZoomToFit();
 
 	}
 
-	this.viewSizeInPixelsHalf = this.viewSizeInPixels.clone().divideScalar(2);
-
-	this.selectionCurrent = null;
-	this.cursorOffsetInSeconds = 0;
-	this.viewZoomToFit();
-
-}
-
-{
 	// constants
 
-	SoundEditor.ColorViewBackground = "White";
-	SoundEditor.ColorViewBaseline = "Black";
-	SoundEditor.ColorViewBorder = "Gray";
-	SoundEditor.ColorViewCursor = "Black";
-	SoundEditor.ColorViewSelectionBorder = "Gray";
-	SoundEditor.ColorViewSelectionFill = "rgba(0, 0, 0, .05)";
-	SoundEditor.ColorViewText = "Black";
-	SoundEditor.ColorViewWaveform = "Gray";
+	static ColorViewBackground = "White";
+	static ColorViewBaseline = "Black";
+	static ColorViewBorder = "Gray";
+	static ColorViewCursor = "Black";
+	static ColorViewSelectionBorder = "Gray";
+	static ColorViewSelectionFill = "rgba(0, 0, 0, .05)";
+	static ColorViewText = "Black";
+	static ColorViewWaveform = "Gray";
 
-	SoundEditor.TextHeightInPixels = 10;
+	static TextHeightInPixels = 10;
 
 	// instance methods
 
-	SoundEditor.prototype.cursorMove = function
+	cursorMove
 	(
 		shouldAdjustmentBeSmall,
 		direction
@@ -62,7 +64,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.distancePerAdjustmentInSeconds = function(shouldAdjustmentBeSmall)
+	distancePerAdjustmentInSeconds(shouldAdjustmentBeSmall)
 	{
 		var distanceToMoveInSeconds;
 
@@ -78,7 +80,7 @@ function SoundEditor
 		return distanceToMoveInSeconds;
 	}
 
-	SoundEditor.prototype.filterSelection = function()
+	filterSelection()
 	{
 		var track = this.session.trackCurrent();
 
@@ -143,7 +145,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.play = function()
+	play()
 	{
 		if (this.soundPlaying != null)
 		{
@@ -184,17 +186,17 @@ function SoundEditor
 		soundToPlay.play(this.play_PlaybackComplete);
 	}
 
-	SoundEditor.prototype.play_PlaybackComplete = function()
+	play_PlaybackComplete()
 	{
 		this.soundPlaying = null;
 	}
 
-	SoundEditor.prototype.record = function()
+	record()
 	{
 		alert("Not yet implemented!");
 	}
 
-	SoundEditor.prototype.stop = function()
+	stop()
 	{
 		if (this.soundPlaying != null)
 		{
@@ -203,7 +205,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.selectAll = function()
+	selectAll()
 	{
 		this.selectionCurrent = new Selection
 		(
@@ -213,13 +215,13 @@ function SoundEditor
 		this.viewZoomToFit();
 	}
 
-	SoundEditor.prototype.selectNone = function()
+	selectNone()
 	{
 		this.selectionCurrent = null;
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.selectionRemoveByTag = function()
+	selectionRemoveByTag()
 	{
 		var tagToRemove = this.inputTagText.value;
 
@@ -243,7 +245,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.selectionResize = function
+	selectionResize
 	(
 		shouldAdjustmentBeSmall,
 		direction
@@ -290,7 +292,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.selectionSelectByTag = function()
+	selectionSelectByTag()
 	{
 		var tagToSelect = this.inputTagText.value;
 
@@ -309,7 +311,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.selectionTag = function()
+	selectionTag()
 	{
 		if (this.selectionCurrent != null)
 		{
@@ -341,7 +343,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.selectionsTaggedExport = function()
+	selectionsTaggedExport()
 	{
 		var fileContents = Selection.convertManyToStringSRT
 		(
@@ -351,12 +353,13 @@ function SoundEditor
 		FileHelper.saveTextAsFile(fileContents, this.session.name + ".srt");
 	}
 
-	SoundEditor.prototype.selectionsTaggedImport = function()
+	selectionsTaggedImport()
 	{
-		var inputFileToLoad = document.createElement("input");
+		var d = document;
+		var inputFileToLoad = d.createElement("input");
 		inputFileToLoad.type = "file";
 		var callback = this.selectionsTaggedImport_LoadComplete.bind(this);
-		inputFileToLoad.onchange = function(event)
+		inputFileToLoad.onchange = (event) =>
 		{
 			var srcElement = event.srcElement;
 			var fileToLoad = srcElement.files[0];
@@ -372,7 +375,7 @@ function SoundEditor
 		);
 	}
 
-	SoundEditor.prototype.selectionsTaggedImport_LoadComplete = function(textFromFile)
+	selectionsTaggedImport_LoadComplete(textFromFile)
 	{
 		var selections = Selection.buildManyFromStringSRT
 		(
@@ -384,12 +387,13 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.sessionLoad = function()
+	sessionLoad()
 	{
-		var inputFileToLoad = document.createElement("input");
+		var d = document;
+		var inputFileToLoad = d.createElement("input");
 		inputFileToLoad.type = "file";
 		var callback = this.sessionLoad_LoadComplete.bind(this);
-		inputFileToLoad.onchange = function(event)
+		inputFileToLoad.onchange = (event) =>
 		{
 			var srcElement = event.srcElement;
 			var fileToLoad = srcElement.files[0];
@@ -405,7 +409,7 @@ function SoundEditor
 		);
 	}
 
-	SoundEditor.prototype.sessionLoad_LoadComplete = function(file, textFromFile)
+	sessionLoad_LoadComplete(file, textFromFile)
 	{
 		this.domElementRemove();
 
@@ -418,7 +422,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.sessionNew = function()
+	sessionNew()
 	{
 		this.session = new Session
 		(
@@ -433,7 +437,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.sessionExportAsWav = function()
+	sessionExportAsWav()
 	{
 		alert("Not yet implemented!");
 		return;
@@ -448,7 +452,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.sessionSave = function()
+	sessionSave()
 	{
 		this.domElementRemove();
 
@@ -459,7 +463,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.tagsExportAsSound = function()
+	tagsExportAsSound()
 	{
 		var track = this.session.trackCurrent();
 
@@ -484,7 +488,7 @@ function SoundEditor
 		);
 	}
 
-	SoundEditor.prototype.tagsPlay = function()
+	tagsPlay()
 	{
 		var track = this.session.trackCurrent();
 
@@ -502,7 +506,7 @@ function SoundEditor
 		soundToPlay.play(this.play_PlaybackComplete);
 	}
 
-	SoundEditor.prototype.tagsPlay_BuildSound = function(soundToSelectFrom)
+	tagsPlay_BuildSound(soundToSelectFrom)
 	{
 		var soundAsWavFileSource = soundToSelectFrom.sourceWavFile;
 
@@ -520,7 +524,8 @@ function SoundEditor
 			samplesForChannels
 		);
 
-		var tagsToPlayAsString = this.session.tagsToPlay; // this.inputTagsToPlay.value;
+		var tagsToPlayAsString =
+			this.session.tagsToPlay; // this.inputTagsToPlay.value;
 		var tagsToPlayAsStrings = tagsToPlayAsString.split(" ");
 
 		for (var t = 0; t < tagsToPlayAsStrings.length; t++)
@@ -548,12 +553,13 @@ function SoundEditor
 		return returnValue;
 	}
 
-	SoundEditor.prototype.trackAdd = function()
+	trackAdd()
 	{
-		var inputFileToLoad = document.createElement("input");
+		var d = document;
+		var inputFileToLoad = d.createElement("input");
 		inputFileToLoad.type = "file";
 		var callback = this.trackAdd_LoadComplete.bind(this);
-		inputFileToLoad.onchange = function(event)
+		inputFileToLoad.onchange = (event) =>
 		{
 			var srcElement = event.srcElement;
 			var fileToLoad = srcElement.files[0];
@@ -572,9 +578,10 @@ function SoundEditor
 		);
 	}
 
-	SoundEditor.prototype.trackAdd_LoadComplete = function(wavFileName, wavFileAsBytes)
+	trackAdd_LoadComplete(wavFileName, wavFileAsBytes)
 	{
-		var wavFileLoaded = WavFile.fromBytes(wavFileName, wavFileAsBytes);
+		var wavFileLoaded =
+			WavFile.fromBytes(wavFileName, wavFileAsBytes);
 		var sound = new Sound
 		(
 			wavFileLoaded.filePath,
@@ -594,19 +601,19 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.trackRemove = function()
+	trackRemove()
 	{
 		alert("Not yet implemented!");
 	}
 
-	SoundEditor.prototype.viewSecondsPerPixel = function()
+	viewSecondsPerPixel()
 	{
 		var returnValue = this.viewWidthInSeconds / this.viewSizeInPixels.x;
 
 		return returnValue;
 	}
 
-	SoundEditor.prototype.viewSlide = function(shouldAdjustmentBeSmall, direction)
+	viewSlide(shouldAdjustmentBeSmall, direction)
 	{
 		var distanceToMoveInSeconds;
 
@@ -635,7 +642,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.viewZoomToFit = function()
+	viewZoomToFit()
 	{
 		this.viewOffsetInSeconds = 0;
 		this.viewWidthInSeconds = this.session.durationInSeconds();
@@ -643,7 +650,7 @@ function SoundEditor
 		this.domElementUpdate();
 	}
 
-	SoundEditor.prototype.viewZoomToSelection = function()
+	viewZoomToSelection()
 	{
 		if (this.selectionCurrent != null)
 		{
@@ -667,7 +674,7 @@ function SoundEditor
 
 	// dom
 
-	SoundEditor.prototype.domElementRemove = function()
+	domElementRemove()
 	{
 		if (this.domElement != null)
 		{
@@ -678,7 +685,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.domElementUpdate = function()
+	domElementUpdate()
 	{
 		this.domElementUpdate_BuildIfNecessary();
 		this.domElementUpdate_Controls();
@@ -689,11 +696,13 @@ function SoundEditor
 		return this.domElement;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary = function()
+	domElementUpdate_BuildIfNecessary()
 	{
 		if (this.domElement == null)
 		{
-			var divEditor = document.createElement("div");
+			var d = document;
+
+			var divEditor = d.createElement("div");
 
 			divEditor.appendChild
 			(
@@ -704,7 +713,7 @@ function SoundEditor
 			divEditor.appendChild(divTracks);
 			this.divTracks = divTracks;
 
-			var divControls = document.createElement("div");
+			var divControls = d.createElement("div");
 
 			divControls.appendChild
 			(
@@ -747,30 +756,35 @@ function SoundEditor
 
 			this.domElement = divEditor;
 
-			document.body.appendChild(this.domElement);
+			d.body.appendChild(this.domElement);
 		}
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsSessionName = function()
+	domElementUpdate_BuildIfNecessary_ControlsSessionName()
 	{
-		var divControlsSessionName = document.createElement("div");
+		var d = document;
+
+		var divControlsSessionName = d.createElement("div");
 		divControlsSessionName.style.border = "1px solid";
 
-		var labelSessionName = document.createElement("label");
+		var labelSessionName = d.createElement("label");
 		labelSessionName.innerHTML = "Session Name:";
 		divControlsSessionName.appendChild(labelSessionName);
 
-		this.inputSessionName = document.createElement("input");
+		this.inputSessionName = d.createElement("input");
 		this.inputSessionName.style.width = 200;
-		this.inputSessionName.onchange = this.handleEventInputSessionNameChanged.bind(this);
+		this.inputSessionName.onchange =
+			this.handleEventInputSessionNameChanged.bind(this);
 		divControlsSessionName.appendChild(this.inputSessionName);
 
 		return divControlsSessionName;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_Tracks = function()
+	domElementUpdate_BuildIfNecessary_Tracks()
 	{
-		var returnValue = document.createElement("div");
+		var d = document;
+
+		var returnValue = d.createElement("div");
 
 		returnValue.style.border = "1px solid";
 		returnValue.style.width = this.viewSizeInPixels.x;
@@ -785,26 +799,28 @@ function SoundEditor
 		return returnValue;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsComposite = function()
+	domElementUpdate_BuildIfNecessary_ControlsComposite()
 	{
-		var divControlsComposite = document.createElement("div");
+		var d = document;
+
+		var divControlsComposite = d.createElement("div");
 		divControlsComposite.style.border = "1px solid";
 
-		var labelTagsToPlay = document.createElement("label");
+		var labelTagsToPlay = d.createElement("label");
 		labelTagsToPlay.innerHTML = "Tags to Play:"
 		divControlsComposite.appendChild(labelTagsToPlay);
 
-		this.inputTagsToPlay = document.createElement("input");
+		this.inputTagsToPlay = d.createElement("input");
 		this.inputTagsToPlay.style.width = 256;
 		this.inputTagsToPlay.onchange = this.handleEventInputTagsToPlay_Changed.bind(this);
 		divControlsComposite.appendChild(this.inputTagsToPlay);
 
-		var buttonPlay = document.createElement("button");
+		var buttonPlay = d.createElement("button");
 		buttonPlay.innerHTML = "Play Tagged Selections";
 		buttonPlay.onclick = this.tagsPlay.bind(this);
 		divControlsComposite.appendChild(buttonPlay);
 
-		var buttonExport = document.createElement("button");
+		var buttonExport = d.createElement("button");
 		buttonExport.innerHTML = "Export Tagged Selections";
 		buttonExport.onclick = this.tagsExportAsSound.bind(this);
 		divControlsComposite.appendChild(buttonExport);
@@ -812,20 +828,22 @@ function SoundEditor
 		return divControlsComposite;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsCursor = function()
+	domElementUpdate_BuildIfNecessary_ControlsCursor()
 	{
-		var divControlsCursor = document.createElement("div");
+		var d = document;
+
+		var divControlsCursor = d.createElement("div");
 		divControlsCursor.style.border = "1px solid";
 
-		var labelCursor = document.createElement("label");
+		var labelCursor = d.createElement("label");
 		labelCursor.innerHTML = "Cursor:";
 		divControlsCursor.appendChild(labelCursor);
 
-		var labelCursorPosInSeconds = document.createElement("label");
+		var labelCursorPosInSeconds = d.createElement("label");
 		labelCursorPosInSeconds.innerHTML = "Seconds:";
 		divControlsCursor.appendChild(labelCursorPosInSeconds);
 
-		this.inputCursorPosInSeconds = document.createElement("input");
+		this.inputCursorPosInSeconds = d.createElement("input");
 		this.inputCursorPosInSeconds.disabled = true; // todo
 		this.inputCursorPosInSeconds.style.width = 64;
 		this.inputCursorPosInSeconds.type = "number";
@@ -835,44 +853,46 @@ function SoundEditor
 		return divControlsCursor;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsFile = function()
+	domElementUpdate_BuildIfNecessary_ControlsFile()
 	{
-		var divControlsFile = document.createElement("div");
+		var d = document;
+
+		var divControlsFile = d.createElement("div");
 		divControlsFile.style.border = "1px solid";
 
-		var buttonTrackAdd = document.createElement("button");
+		var buttonTrackAdd = d.createElement("button");
 		buttonTrackAdd.innerHTML = "Load Sound as Track";
 		buttonTrackAdd.onclick = this.trackAdd.bind(this);
 		divControlsFile.appendChild(buttonTrackAdd);
 		this.buttonTrackAdd = buttonTrackAdd;
 
-		var buttonSessionNew = document.createElement("button");
+		var buttonSessionNew = d.createElement("button");
 		buttonSessionNew.innerHTML = "New Session";
 		buttonSessionNew.onclick = this.sessionNew.bind(this);
 		divControlsFile.appendChild(buttonSessionNew);
 
-		var buttonSessionLoad = document.createElement("button");
+		var buttonSessionLoad = d.createElement("button");
 		buttonSessionLoad.innerHTML = "Load Session";
 		buttonSessionLoad.onclick = this.sessionLoad.bind(this);
 		divControlsFile.appendChild(buttonSessionLoad);
 		this.buttonSessionLoad = buttonSessionLoad;
 
-		var buttonSessionSave = document.createElement("button");
+		var buttonSessionSave = d.createElement("button");
 		buttonSessionSave.innerHTML = "Save Session";
 		buttonSessionSave.onclick = this.sessionSave.bind(this);
 		divControlsFile.appendChild(buttonSessionSave);
 
-		var buttonSessionExportAsWAV = document.createElement("button");
+		var buttonSessionExportAsWAV = d.createElement("button");
 		buttonSessionExportAsWAV.innerHTML = "Export Session as WAV";
 		buttonSessionExportAsWAV.onclick = this.sessionExportAsWav.bind(this);
 		divControlsFile.appendChild(buttonSessionExportAsWAV);
 
-		var buttonTagsExport = document.createElement("button");
+		var buttonTagsExport = d.createElement("button");
 		buttonTagsExport.innerHTML = "Export Tags";
 		buttonTagsExport.onclick = this.selectionsTaggedExport.bind(this);
 		divControlsFile.appendChild(buttonTagsExport);
 
-		var buttonTagsImport = document.createElement("button");
+		var buttonTagsImport = d.createElement("button");
 		buttonTagsImport.innerHTML = "Import Tags";
 		buttonTagsImport.onclick = this.selectionsTaggedImport.bind(this);
 		divControlsFile.appendChild(buttonTagsImport);
@@ -883,45 +903,47 @@ function SoundEditor
 		return divControlsFile;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsFilter = function()
+	domElementUpdate_BuildIfNecessary_ControlsFilter()
 	{
-		var divControlsFilter = document.createElement("div");
+		var d = document;
+
+		var divControlsFilter = d.createElement("div");
 		divControlsFilter.style.border = "1px solid";
 
-		var labelFilter = document.createElement("label");
+		var labelFilter = d.createElement("label");
 		labelFilter.innerHTML = "Filter:";
 		divControlsFilter.appendChild(labelFilter);
 
-		var labelType = document.createElement("label");
+		var labelType = d.createElement("label");
 		labelType.innerHTML = "Type:";
 		divControlsFilter.appendChild(labelType);
 
-		this.selectFilterType = document.createElement("select");
+		this.selectFilterType = d.createElement("select");
 		this.selectFilterType.style.width = 128;
 		divControlsFilter.appendChild(this.selectFilterType);
 
-		var filters = Filter.Instances._All;
+		var filters = Filter.Instances()._All;
 
 		for (var i = 0; i < filters.length; i++)
 		{
 			var filter = filters[i];
 
-			var optionForFilter = document.createElement("option");
+			var optionForFilter = d.createElement("option");
 			optionForFilter.innerHTML = filter.name;
 			optionForFilter.entity = filter;
 
 			this.selectFilterType.appendChild(optionForFilter);
 		}
 
-		var labelParameters = document.createElement("label");
+		var labelParameters = d.createElement("label");
 		labelParameters.innerHTML = "Parameters:";
 		divControlsFilter.appendChild(labelParameters);
 
-		this.inputFilterParameters = document.createElement("input");
+		this.inputFilterParameters = d.createElement("input");
 		this.inputFilterParameters.style.width = 128;
 		divControlsFilter.appendChild(this.inputFilterParameters);
 
-		var buttonFilterSelection = document.createElement("button");
+		var buttonFilterSelection = d.createElement("button");
 		buttonFilterSelection.innerHTML = "Filter Selection";
 		buttonFilterSelection.onclick = this.filterSelection.bind(this);
 		divControlsFilter.appendChild(buttonFilterSelection);
@@ -929,22 +951,24 @@ function SoundEditor
 		return divControlsFilter;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsPlayback = function()
+	domElementUpdate_BuildIfNecessary_ControlsPlayback()
 	{
-		var divControlsPlayback = document.createElement("div");
+		var d = document;
+
+		var divControlsPlayback = d.createElement("div");
 		divControlsPlayback.style.border = "1px solid";
 
-		var buttonPlay = document.createElement("button");
+		var buttonPlay = d.createElement("button");
 		buttonPlay.innerHTML = "Play";
 		buttonPlay.onclick = this.play.bind(this);
 		divControlsPlayback.appendChild(buttonPlay);
 
-		var buttonStop = document.createElement("button");
+		var buttonStop = d.createElement("button");
 		buttonStop.innerHTML = "Stop";
 		buttonStop.onclick = this.stop.bind(this);
 		divControlsPlayback.appendChild(buttonStop);
 
-		var buttonRecord = document.createElement("button");
+		var buttonRecord = d.createElement("button");
 		buttonRecord.innerHTML = "Record";
 		buttonRecord.onclick = this.record.bind(this);
 		this.buttonRecord = buttonRecord;
@@ -955,66 +979,68 @@ function SoundEditor
 		return divControlsPlayback;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsSelection = function()
+	domElementUpdate_BuildIfNecessary_ControlsSelection()
 	{
-		var divControlsSelection = document.createElement("div");
+		var d = document;
+
+		var divControlsSelection = d.createElement("div");
 		divControlsSelection.style.border = "1px solid";
 
-		var labelSelected = document.createElement("label");
+		var labelSelected = d.createElement("label");
 		labelSelected.innerHTML = "Selected:";
 		divControlsSelection.appendChild(labelSelected);
 
-		var labelSelectionStartInSeconds = document.createElement("label");
+		var labelSelectionStartInSeconds = d.createElement("label");
 		labelSelectionStartInSeconds.innerHTML = "Seconds:";
 		divControlsSelection.appendChild(labelSelectionStartInSeconds);
 
-		this.inputSelectionStartInSeconds = document.createElement("input");
+		this.inputSelectionStartInSeconds = d.createElement("input");
 		this.inputSelectionStartInSeconds.disabled = true; // todo
 		this.inputSelectionStartInSeconds.style.width = 64;
 		this.inputSelectionStartInSeconds.type = "number";
 		this.inputSelectionStartInSeconds.onchange = this.handleEventInputSelectionStartInSecondsChanged.bind(this);
 		divControlsSelection.appendChild(this.inputSelectionStartInSeconds);
 
-		var labelSelectionEndInSeconds = document.createElement("label");
+		var labelSelectionEndInSeconds = d.createElement("label");
 		labelSelectionEndInSeconds.innerHTML = "to";
 		divControlsSelection.appendChild(labelSelectionEndInSeconds);
 
-		this.inputSelectionEndInSeconds = document.createElement("input");
+		this.inputSelectionEndInSeconds = d.createElement("input");
 		this.inputSelectionEndInSeconds.disabled = true;
 		this.inputSelectionEndInSeconds.style.width = 64;
 		this.inputSelectionEndInSeconds.type = "number";
 		this.inputSelectionEndInSeconds.onchange = this.handleEventInputSelectionEndInSecondsChanged.bind(this);
 		divControlsSelection.appendChild(this.inputSelectionEndInSeconds);
 
-		var buttonSelectAll = document.createElement("button");
+		var buttonSelectAll = d.createElement("button");
 		buttonSelectAll.innerHTML = "All";
 		buttonSelectAll.onclick = this.selectAll.bind(this);
 		divControlsSelection.appendChild(buttonSelectAll);
 
-		var buttonSelectNone = document.createElement("button");
+		var buttonSelectNone = d.createElement("button");
 		buttonSelectNone.innerHTML = "None";
 		buttonSelectNone.onclick = this.selectNone.bind(this);
 		divControlsSelection.appendChild(buttonSelectNone);
 
-		var labelTag = document.createElement("label");
+		var labelTag = d.createElement("label");
 		labelTag.innerHTML = "Tag:";
 		divControlsSelection.appendChild(labelTag);
 
-		this.inputTagText = document.createElement("input");
+		this.inputTagText = d.createElement("input");
 		this.inputTagText.style.width = 128;
 		divControlsSelection.appendChild(this.inputTagText);
 
-		var buttonTagAdd = document.createElement("button");
+		var buttonTagAdd = d.createElement("button");
 		buttonTagAdd.innerHTML = "Tag Selection";
 		buttonTagAdd.onclick = this.selectionTag.bind(this);
 		divControlsSelection.appendChild(buttonTagAdd);
 
-		var buttonTagSelect = document.createElement("button");
+		var buttonTagSelect = d.createElement("button");
 		buttonTagSelect.innerHTML = "Select by Tag";
 		buttonTagSelect.onclick = this.selectionSelectByTag.bind(this);
 		divControlsSelection.appendChild(buttonTagSelect);
 
-		var buttonTagRemove = document.createElement("button");
+		var buttonTagRemove = d.createElement("button");
 		buttonTagRemove.innerHTML = "Remove Selection by Tag";
 		buttonTagRemove.onclick = this.selectionRemoveByTag.bind(this);
 		divControlsSelection.appendChild(buttonTagRemove);
@@ -1022,17 +1048,19 @@ function SoundEditor
 		return divControlsSelection;
 	}
 
-	SoundEditor.prototype.domElementUpdate_BuildIfNecessary_ControlsZoom = function()
+	domElementUpdate_BuildIfNecessary_ControlsZoom()
 	{
-		var divControlsZoom = document.createElement("div");
+		var d = document;
+
+		var divControlsZoom = d.createElement("div");
 		divControlsZoom.style.border = "1px solid";
 
-		var buttonZoomToSelection = document.createElement("button");
+		var buttonZoomToSelection = d.createElement("button");
 		buttonZoomToSelection.innerHTML = "Zoom to Selection";
 		buttonZoomToSelection.onclick = this.viewZoomToSelection.bind(this);
 		divControlsZoom.appendChild(buttonZoomToSelection);
 
-		var buttonZoomToFit = document.createElement("button");
+		var buttonZoomToFit = d.createElement("button");
 		buttonZoomToFit.innerHTML = "Zoom to Fit";
 		buttonZoomToFit.onclick = this.viewZoomToFit.bind(this);
 		divControlsZoom.appendChild(buttonZoomToFit);
@@ -1040,18 +1068,18 @@ function SoundEditor
 		return divControlsZoom;
 	}
 
-	SoundEditor.prototype.domElementUpdate_Controls = function()
+	domElementUpdate_Controls()
 	{
 		this.inputSessionName.value = this.session.name;
 		this.inputTagsToPlay.value = this.session.tagsToPlay;
 	}
 
-	SoundEditor.prototype.domElementUpdate_Cursor = function()
+	domElementUpdate_Cursor()
 	{
 		this.inputCursorPosInSeconds.value = this.cursorOffsetInSeconds;
 	}
 
-	SoundEditor.prototype.domElementUpdate_Selection = function()
+	domElementUpdate_Selection()
 	{
 		if (this.selectionCurrent == null)
 		{
@@ -1069,7 +1097,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.domElementUpdate_Waveform = function()
+	domElementUpdate_Waveform()
 	{
 		for (var t = 0; t < this.session.tracks.length; t++)
 		{
@@ -1084,32 +1112,32 @@ function SoundEditor
 
 	// events
 
-	SoundEditor.prototype.handleEventInputCursorPosInSecondsChanged = function(event)
+	handleEventInputCursorPosInSecondsChanged(event)
 	{
 		// todo
 	}
 
-	SoundEditor.prototype.handleEventInputSelectionStartInSecondsChanged = function(event)
+	handleEventInputSelectionStartInSecondsChanged(event)
 	{
 		// todo
 	}
 
-	SoundEditor.prototype.handleEventInputSelectionEndInSecondsChanged = function(event)
+	handleEventInputSelectionEndInSecondsChanged(event)
 	{
 		// todo
 	}
 
-	SoundEditor.prototype.handleEventInputSessionNameChanged = function(event)
+	handleEventInputSessionNameChanged(event)
 	{
 		this.session.name = event.target.value;
 	}
 
-	SoundEditor.prototype.handleEventInputTagsToPlay_Changed = function(event)
+	handleEventInputTagsToPlay_Changed(event)
 	{
 		this.session.tagsToPlay = event.target.value;
 	}
 
-	SoundEditor.prototype.handleEventKeyDown = function(event)
+	handleEventKeyDown(event)
 	{
 		var key = event.key;
 
@@ -1159,7 +1187,7 @@ function SoundEditor
 		}
 	}
 
-	SoundEditor.prototype.handleEventKeyDown_ArrowLeftOrRight = function(event, direction)
+	handleEventKeyDown_ArrowLeftOrRight(event, direction)
 	{
 		var shouldAdjustmentBeSmall = event.ctrlKey;
 

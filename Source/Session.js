@@ -1,21 +1,22 @@
 
-function Session(name, tagsToPlay, tracks, selectionsTagged)
+class Session
 {
-	this.name = name;
-	this.tagsToPlay = tagsToPlay;
-	this.tracks = tracks;
-	this.selectionsTagged = selectionsTagged;
+	constructor(name, tagsToPlay, tracks, selectionsTagged)
+	{
+		this.name = name;
+		this.tagsToPlay = tagsToPlay;
+		this.tracks = tracks;
+		this.selectionsTagged = selectionsTagged;
 
-	this.trackIndexCurrent = 0;
-}
+		this.trackIndexCurrent = 0;
+	}
 
-{
-	Session.prototype.addLookups = function()
+	addLookups()
 	{
 		this.selectionsTagged.addLookups("tag");
 	}
 
-	Session.prototype.durationInSeconds = function()
+	durationInSeconds()
 	{
 		var trackEndInSecondsMax = 0;
 
@@ -32,7 +33,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 		return trackEndInSecondsMax;
 	}
 
-	Session.prototype.trackCurrent = function(valueToSet)
+	trackCurrent(valueToSet)
 	{
 		if (valueToSet != null)
 		{
@@ -44,7 +45,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 
 	// dom
 
-	Session.prototype.domElementRemove = function()
+	domElementRemove()
 	{
 		for (var t = 0; t < this.tracks.length; t++)
 		{
@@ -55,7 +56,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 
 	// json
 
-	Session.fromStringJSON = function(sessionAsJSON)
+	static fromStringJSON(sessionAsJSON)
 	{
 		var session = JSON.parse(sessionAsJSON);
 		session.__proto__ = Session.prototype;
@@ -88,7 +89,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 		return session;
 	}
 
-	Session.prototype.toStringJSON = function()
+	toStringJSON()
 	{
 		var wavFilesToRestore = [];
 
@@ -127,7 +128,7 @@ function Session(name, tagsToPlay, tracks, selectionsTagged)
 
 	// wav
 
-	Session.prototype.toWavFile = function()
+	toWavFile()
 	{
 		var trackToExport = this.tracks[0]; // todo - Mix down.
 		var trackToExportAsWavFile = trackToExport.toWavFile();

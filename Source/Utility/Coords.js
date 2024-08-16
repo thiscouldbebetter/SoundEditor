@@ -1,17 +1,18 @@
 
-function Coords(x, y)
+class Coords
 {
-	this.x = x;
-	this.y = y;
-}
+	constructor(x, y)
+	{
+		this.x = x;
+		this.y = y;
+	}
 
-{
-	Coords.prototype.clone = function()
+	clone()
 	{
 		return new Coords(this.x, this.y);
 	}
 
-	Coords.prototype.divideScalar = function(scalar)
+	divideScalar(scalar)
 	{
 		this.x /= scalar;
 		this.y /= scalar;

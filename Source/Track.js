@@ -1,12 +1,13 @@
 
-function Track(name, sounds)
+class Track
 {
-	this.name = name;
-	this.sounds = sounds;
-}
+	constructor(name, sounds)
+	{
+		this.name = name;
+		this.sounds = sounds;
+	}
 
-{
-	Track.prototype.durationInSeconds = function()
+	durationInSeconds()
 	{
 		var soundEndInSecondsMax = 0;
 
@@ -28,13 +29,13 @@ function Track(name, sounds)
 
 	// dom
 
-	Track.prototype.domElementRemove = function()
+	domElementRemove()
 	{
 		delete this.domElement;
 		delete this.display;
 	}
 
-	Track.prototype.domElementUpdate = function(soundEditor)
+	domElementUpdate(soundEditor)
 	{
 		var viewSizeInPixels = soundEditor.viewSizeInPixels;
 
@@ -58,7 +59,7 @@ function Track(name, sounds)
 		return this.domElement;
 	}
 
-	Track.prototype.domElementUpdate_Background = function(viewSizeInPixels)
+	domElementUpdate_Background(viewSizeInPixels)
 	{
 		this.display.drawRectangle
 		(
@@ -69,7 +70,7 @@ function Track(name, sounds)
 		);
 	}
 
-	Track.prototype.domElementUpdate_BuildIfNecessary = function(viewSizeInPixels)
+	domElementUpdate_BuildIfNecessary(viewSizeInPixels)
 	{
 		if (this.domElement == null)
 		{
@@ -80,7 +81,7 @@ function Track(name, sounds)
 		}
 	}
 
-	Track.prototype.domElementUpdate_Cursor = function(soundEditor)
+	domElementUpdate_Cursor(soundEditor)
 	{
 		var cursorPosInSeconds = soundEditor.cursorOffsetInSeconds;
 
@@ -114,7 +115,7 @@ function Track(name, sounds)
 		);
 	}
 
-	Track.prototype.domElementUpdate_Selections = function(soundEditor)
+	domElementUpdate_Selections(soundEditor)
 	{
 		var selectionsTagged = soundEditor.session.selectionsTagged;
 
@@ -134,7 +135,7 @@ function Track(name, sounds)
 		return this.domElement;
 	}
 
-	Track.prototype.domElementUpdate_Selection = function(soundEditor, selectionCurrent)
+	domElementUpdate_Selection(soundEditor, selectionCurrent)
 	{
 		var viewSizeInPixels = soundEditor.viewSizeInPixels;
 
@@ -182,7 +183,7 @@ function Track(name, sounds)
 		}
 	}
 
-	Track.prototype.domElementUpdate_Sound = function(soundEditor, sound)
+	domElementUpdate_Sound(soundEditor, sound)
 	{
 		if (soundEditor.hasViewBeenUpdated)
 		{
@@ -192,7 +193,7 @@ function Track(name, sounds)
 		this.display.drawImage(this.displayForSound.canvas, new Coords(0, 0));
 	}
 
-	Track.prototype.domElementUpdate_Sound_Refresh = function(soundEditor, sound)
+	domElementUpdate_Sound_Refresh(soundEditor, sound)
 	{
 		soundEditor.hasViewBeenUpdated = false;
 
@@ -211,9 +212,12 @@ function Track(name, sounds)
 		var viewWidthInPixels = viewSizeInPixels.x;
 		var viewHeightInPixelsHalf = soundEditor.viewSizeInPixelsHalf.y;
 
-		var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
-		var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
-		var samplePosInPixels = new Coords(0, viewHeightInPixelsHalf);
+		var viewOffsetInSamples =
+			Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
+		var viewWidthInSamples =
+			Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
+		var samplePosInPixels =
+			new Coords(0, viewHeightInPixelsHalf);
 		var sampleValue = 0;
 
 		this.displayForSound = new Display(this.display.size);
@@ -243,7 +247,7 @@ function Track(name, sounds)
 		);
 	}
 
-	Track.prototype.domElementUpdate_Sound_Refresh_Sample = function
+	domElementUpdate_Sound_Refresh_Sample
 	(
 		viewOffsetInSamples, soundOffsetInSamples, samples,
 		viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples,
@@ -295,7 +299,7 @@ function Track(name, sounds)
 		}
 	}
 
-	Track.prototype.domElementUpdate_Title = function(viewSizeInPixels)
+	domElementUpdate_Title(viewSizeInPixels)
 	{
 		this.display.drawRectangle
 		(
@@ -306,7 +310,7 @@ function Track(name, sounds)
 		);
 	}
 
-	Track.prototype.domElementUpdate_ViewTimeRange = function(soundEditor)
+	domElementUpdate_ViewTimeRange(soundEditor)
 	{
 		var viewMinInSeconds = Math.floor
 		(
@@ -347,7 +351,7 @@ function Track(name, sounds)
 
 	// event
 
-	Track.prototype.handleEventMouseDown = function(event)
+	handleEventMouseDown(event)
 	{
 		var soundEditor = Globals.Instance.soundEditor;
 		var session = soundEditor.session;
@@ -378,7 +382,7 @@ function Track(name, sounds)
 		soundEditor.domElementUpdate();
 	}
 
-	Track.prototype.handleEventMouseMove = function(event)
+	handleEventMouseMove(event)
 	{
 		var soundEditor = Globals.Instance.soundEditor;
 
@@ -392,14 +396,15 @@ function Track(name, sounds)
 			);
 		}
 
-		var mousePointerOffsetInSeconds = this.mousePointerOffsetInSecondsForEvent(event);
+		var mousePointerOffsetInSeconds =
+			this.mousePointerOffsetInSecondsForEvent(event);
 
 		soundEditor.cursorOffsetInSeconds = mousePointerOffsetInSeconds;
 		soundEditor.selectionCurrent.timeEndInSeconds = soundEditor.cursorOffsetInSeconds;
 		soundEditor.domElementUpdate();
 	}
 
-	Track.prototype.handleEventMouseUp = function(event)
+	handleEventMouseUp(event)
 	{
 		var soundEditor = Globals.Instance.soundEditor;
 
@@ -409,7 +414,7 @@ function Track(name, sounds)
 		}
 	}
 
-	Track.prototype.mousePointerOffsetInSecondsForEvent = function(event)
+	mousePointerOffsetInSecondsForEvent(event)
 	{
 		var mousePointerPosInPixels =
 			event.x
@@ -429,7 +434,7 @@ function Track(name, sounds)
 		return mousePointerOffsetInSeconds;
 	}
 
-	Track.prototype.toWavFile = function()
+	toWavFile()
 	{
 		var soundToExport = this.sounds[0]; // todo - Combine.
 		var soundToExportAsWavFile = soundToExport.sourceWavFile; // todo - Transform.

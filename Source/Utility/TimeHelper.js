@@ -1,15 +1,11 @@
 
-function TimeHelper()
+class TimeHelper
 {
-	// static class
-}
+	static SecondsPerMinute = 60;
+	static MinutesPerHour = 60;
+	static MillisecondsPerSecond = 1000;
 
-{
-	TimeHelper.SecondsPerMinute = 60;
-	TimeHelper.MinutesPerHour = 60;
-	TimeHelper.MillisecondsPerSecond = 1000;
-
-	TimeHelper.secondsToStringHHMMSSmmm = function(secondsTotal)
+	static secondsToStringHHMMSSmmm(secondsTotal)
 	{
 		var minutesTotal =
 			Math.floor(secondsTotal / TimeHelper.SecondsPerMinute);
@@ -42,7 +38,7 @@ function TimeHelper()
 		return returnValue;
 	}
 
-	TimeHelper.secondsToStringSecondsMilliseconds = function(secondsTotal)
+	static secondsToStringSecondsMilliseconds(secondsTotal)
 	{
 		var secondsWhole = Math.floor(secondsTotal);
 
