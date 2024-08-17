@@ -77,6 +77,9 @@ class WavFile {
         }
         this.samplesForChannels = samplesForChannelsNew;
     }
+    prototypesSet() {
+        Object.setPrototypeOf(this.samplingInfo, WavFileSamplingInfo.prototype);
+    }
     // bytes
     // read
     static fromBytes(name, bytes) {

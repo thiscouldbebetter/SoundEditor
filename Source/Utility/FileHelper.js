@@ -1,6 +1,6 @@
 "use strict";
 class FileHelper {
-    static loadFileAsText(fileToLoad, callback) {
+    static loadFileAsTextAndSendToCallback(fileToLoad, callback) {
         var fileReader = new FileReader();
         fileReader.onload = (fileLoadedEvent) => {
             var textFromFileLoaded = fileLoadedEvent.target.result;
@@ -8,7 +8,7 @@ class FileHelper {
         };
         fileReader.readAsText(fileToLoad, "UTF-8");
     }
-    static loadFileAsBytes(fileToLoad, callback) {
+    static loadFileAsBytesAndSendToCallback(fileToLoad, callback) {
         var fileReader = new FileReader();
         fileReader.onload = (fileLoadedEvent) => {
             var fileContentsAsBinaryString = fileLoadedEvent.target.result;

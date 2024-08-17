@@ -1,0 +1,8 @@
+Known Errors
+============
+
+1. The waveform image is not being updated after a filter is applied.
+2. The amplify filter seems to distort the sound in some circumstances, as when using it to halve the amplitude of the float-sampled sine .wav.
+3. One of the sample sine waves in the Content directory, the one that uses float samples, doesn't appear to be a sine wave in the waveform view, though it does sound like one.
+4. If the "Load Sound as Track" button is clicked multiple times in a row, more than one upload control appears.
+5. The old "JFK-We_Choose" session no longer loads.

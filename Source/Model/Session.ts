@@ -1,4 +1,4 @@
-	
+
 class Session
 {
 	name: string;
@@ -73,23 +73,32 @@ class Session
 	static fromStringJSON(sessionAsJSON: string): Session
 	{
 		var session = JSON.parse(sessionAsJSON);
-		session.__proto__ = Session.prototype;
+		Object.setPrototypeOf(session, Session.prototype);
 
 		var tracks = session.tracks;
 		for (var i = 0; i < tracks.length; i++)
 		{
 			var track = tracks[i];
-			track.__proto__ = Track.prototype;
+			Object.setPrototypeOf(track, Track.prototype);
 
 			var sounds = track.sounds;
 			for (var s = 0; s < sounds.length; s++)
 			{
 				var sound = sounds[s];
-				sound.__proto__ = Sound.prototype;
+				Object.setPrototypeOf(sound, Sound.prototype);
 
+				// The conversion at save time
+				// isn't happening at the moment,
+				// so instead we just assign the prototype.
+				/*
 				var sourceWavFileAsJSON = sound.sourceWavFile;
-				var sourceWavFile = WavFile.fromStringJSON(sourceWavFileAsJSON);
+				var sourceWavFile =
+					WavFile.fromStringJSON(sourceWavFileAsJSON);
 				sound.sourceWavFile = sourceWavFile;
+				*/
+				var wavFile = sound.sourceWavFile;
+				Object.setPrototypeOf(wavFile, WavFile.prototype);
+				wavFile.prototypesSet();
 			}
 		}
 

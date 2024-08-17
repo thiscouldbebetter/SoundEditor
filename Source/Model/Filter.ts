@@ -26,6 +26,11 @@ class Filter
 		}
 		return this._instances;
 	}
+
+	static byName(name: string): Filter
+	{
+		return Filter.Instances().byName(name);
+	}
 }
 
 class Filter_Instances
@@ -88,5 +93,10 @@ class Filter_Instances
 		];
 
 		this._AllByName = new Map(this._All.map(x => [x.name, x] ) );
+	}
+
+	byName(name: string): Filter
+	{
+		return this._AllByName.get(name);
 	}
 }

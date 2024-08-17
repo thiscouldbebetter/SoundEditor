@@ -158,6 +158,11 @@ class WavFile
 		this.samplesForChannels = samplesForChannelsNew;
 	}
 
+	prototypesSet(): void
+	{
+		Object.setPrototypeOf(this.samplingInfo, WavFileSamplingInfo.prototype);
+	}
+
 	// bytes
 
 	// read

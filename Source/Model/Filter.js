@@ -11,6 +11,9 @@ class Filter {
         }
         return this._instances;
     }
+    static byName(name) {
+        return Filter.Instances().byName(name);
+    }
 }
 class Filter_Instances {
     constructor() {
@@ -41,5 +44,8 @@ class Filter_Instances {
                 this.Sine,
             ];
         this._AllByName = new Map(this._All.map(x => [x.name, x]));
+    }
+    byName(name) {
+        return this._AllByName.get(name);
     }
 }

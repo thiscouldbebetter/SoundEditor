@@ -29,13 +29,17 @@ class SoundEditor {
         }
         return distanceToMoveInSeconds;
     }
+    filterByName(name) {
+        return Filter.byName(name);
+    }
     filterSelection() {
         var track = this.session.trackCurrent();
         if (track == null || this.selectionCurrent == null) {
             alert("Nothing to filter!");
             return;
         }
-        var filterSelected = this.selectFilterType.selectedOptions[0].entity;
+        var filterSelectedName = this.selectFilterType.selectedOptions[0].value;
+        var filterSelected = this.filterByName(filterSelectedName);
         var parametersForFilter = this.inputFilterParameters.value;
         var sound = track.sounds[0];
         var soundSource = sound.sourceWavFile;
@@ -87,7 +91,8 @@ class SoundEditor {
             );
         }
         this.soundPlaying = soundToPlay;
-        soundToPlay.play(this.play_PlaybackComplete);
+        var soundEditor = this;
+        soundToPlay.play(() => soundEditor.play_PlaybackComplete());
     }
     play_PlaybackComplete() {
         this.soundPlaying = null;
@@ -193,7 +198,7 @@ class SoundEditor {
             var srcElement = event.srcElement;
             var fileToLoad = srcElement.files[0];
             srcElement.parentElement.removeChild(srcElement);
-            FileHelper.loadFileAsText(fileToLoad, callback);
+            FileHelper.loadFileAsTextAndSendToCallback(fileToLoad, callback);
         };
         this.divControlsFile.insertBefore(inputFileToLoad, this.buttonTagsImport.nextSibling);
     }
@@ -211,7 +216,7 @@ class SoundEditor {
             var srcElement = event.srcElement;
             var fileToLoad = srcElement.files[0];
             srcElement.parentElement.removeChild(srcElement);
-            FileHelper.loadFileAsText(fileToLoad, callback);
+            FileHelper.loadFileAsTextAndSendToCallback(fileToLoad, callback);
         };
         this.divControlsFile.insertBefore(inputFileToLoad, this.buttonSessionLoad.nextSibling);
     }
@@ -241,8 +246,9 @@ class SoundEditor {
     }
     sessionSave() {
         this.domElementRemove();
-        var sessionAsJSON = this.session.toStringJSON();
-        FileHelper.saveTextAsFile(sessionAsJSON, this.session.name + ".json");
+        var sessionAsJson = this.session.toStringJSON();
+        var sessionFileName = this.session.name + ".SoundEditorSession.json";
+        FileHelper.saveTextAsFile(sessionAsJson, sessionFileName);
         this.domElementUpdate();
     }
     tagsExportAsSound() {
@@ -302,12 +308,13 @@ class SoundEditor {
         inputFileToLoad.onchange = (event) => {
             var srcElement = event.srcElement;
             var fileToLoad = srcElement.files[0];
-            FileHelper.loadFileAsBytes(fileToLoad, callback);
+            FileHelper.loadFileAsBytesAndSendToCallback(fileToLoad, callback);
             srcElement.parentElement.removeChild(srcElement);
         };
         this.divControlsFile.insertBefore(inputFileToLoad, this.buttonTrackAdd.nextSibling);
     }
-    trackAdd_LoadComplete(wavFileName, wavFileAsBytes) {
+    trackAdd_LoadComplete(wavFileLoadedAsFileObject, wavFileAsBytes) {
+        var wavFileName = wavFileLoadedAsFileObject.name;
         var wavFileLoaded = WavFile.fromBytes(wavFileName, wavFileAsBytes);
         var sound = new Sound(wavFileLoaded.filePath, wavFileLoaded, 0 // offsetInSeconds
         );
@@ -397,10 +404,10 @@ class SoundEditor {
     }
     domElementUpdate_BuildIfNecessary_ControlsSessionName() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsSessionName = d.createElement("div");
         divControlsSessionName.style.border = "1px solid";
-        var labelSessionName = d.createElement("label");
-        labelSessionName.innerHTML = "Session Name:";
+        var labelSessionName = controlBuilder.label("Session Name:");
         divControlsSessionName.appendChild(labelSessionName);
         this.inputSessionName = d.createElement("input");
         this.inputSessionName.style.width = 200;
@@ -423,35 +430,30 @@ class SoundEditor {
     }
     domElementUpdate_BuildIfNecessary_ControlsComposite() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsComposite = d.createElement("div");
         divControlsComposite.style.border = "1px solid";
-        var labelTagsToPlay = d.createElement("label");
-        labelTagsToPlay.innerHTML = "Tags to Play:";
+        var labelTagsToPlay = controlBuilder.label("Tags to Play:");
         divControlsComposite.appendChild(labelTagsToPlay);
         this.inputTagsToPlay = d.createElement("input");
         this.inputTagsToPlay.style.width = 256;
         this.inputTagsToPlay.onchange =
             this.handleEventInputTagsToPlay_Changed.bind(this);
         divControlsComposite.appendChild(this.inputTagsToPlay);
-        var buttonPlay = d.createElement("button");
-        buttonPlay.innerHTML = "Play Tagged Selections";
-        buttonPlay.onclick = this.tagsPlay.bind(this);
+        var buttonPlay = controlBuilder.button("Play Tagged Selections", this.tagsPlay.bind(this));
         divControlsComposite.appendChild(buttonPlay);
-        var buttonExport = d.createElement("button");
-        buttonExport.innerHTML = "Export Tagged Selections";
-        buttonExport.onclick = this.tagsExportAsSound.bind(this);
+        var buttonExport = controlBuilder.button("Export Tagged Selections", this.tagsExportAsSound.bind(this));
         divControlsComposite.appendChild(buttonExport);
         return divControlsComposite;
     }
     domElementUpdate_BuildIfNecessary_ControlsCursor() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsCursor = d.createElement("div");
         divControlsCursor.style.border = "1px solid";
-        var labelCursor = d.createElement("label");
-        labelCursor.innerHTML = "Cursor:";
+        var labelCursor = controlBuilder.label("Cursor:");
         divControlsCursor.appendChild(labelCursor);
-        var labelCursorPosInSeconds = d.createElement("label");
-        labelCursorPosInSeconds.innerHTML = "Seconds:";
+        var labelCursorPosInSeconds = controlBuilder.label("Seconds:");
         divControlsCursor.appendChild(labelCursorPosInSeconds);
         this.inputCursorPosInSeconds = d.createElement("input");
         this.inputCursorPosInSeconds.disabled = true; // todo
@@ -464,51 +466,34 @@ class SoundEditor {
     }
     domElementUpdate_BuildIfNecessary_ControlsFile() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsFile = d.createElement("div");
         divControlsFile.style.border = "1px solid";
-        var buttonTrackAdd = d.createElement("button");
-        buttonTrackAdd.innerHTML = "Load Sound as Track";
-        buttonTrackAdd.onclick = this.trackAdd.bind(this);
-        divControlsFile.appendChild(buttonTrackAdd);
-        this.buttonTrackAdd = buttonTrackAdd;
-        var buttonSessionNew = d.createElement("button");
-        buttonSessionNew.innerHTML = "New Session";
-        buttonSessionNew.onclick = this.sessionNew.bind(this);
+        this.buttonTrackAdd = controlBuilder.button("Load Sound as Track", this.trackAdd.bind(this));
+        divControlsFile.appendChild(this.buttonTrackAdd);
+        var buttonSessionNew = controlBuilder.button("New Session", this.sessionNew.bind(this));
         divControlsFile.appendChild(buttonSessionNew);
-        var buttonSessionLoad = d.createElement("button");
-        buttonSessionLoad.innerHTML = "Load Session";
-        buttonSessionLoad.onclick = this.sessionLoad.bind(this);
-        divControlsFile.appendChild(buttonSessionLoad);
-        this.buttonSessionLoad = buttonSessionLoad;
-        var buttonSessionSave = d.createElement("button");
-        buttonSessionSave.innerHTML = "Save Session";
-        buttonSessionSave.onclick = this.sessionSave.bind(this);
+        this.buttonSessionLoad = controlBuilder.button("Load Session", this.sessionLoad.bind(this));
+        divControlsFile.appendChild(this.buttonSessionLoad);
+        var buttonSessionSave = controlBuilder.button("Save Session", this.sessionSave.bind(this));
         divControlsFile.appendChild(buttonSessionSave);
-        var buttonSessionExportAsWAV = d.createElement("button");
-        buttonSessionExportAsWAV.innerHTML = "Export Session as WAV";
-        buttonSessionExportAsWAV.onclick = this.sessionExportAsWav.bind(this);
-        divControlsFile.appendChild(buttonSessionExportAsWAV);
-        var buttonTagsExport = d.createElement("button");
-        buttonTagsExport.innerHTML = "Export Tags";
-        buttonTagsExport.onclick = this.selectionsTaggedExport.bind(this);
+        var buttonSessionExportAsWav = controlBuilder.button("Export Session as WAV", this.sessionExportAsWav.bind(this));
+        divControlsFile.appendChild(buttonSessionExportAsWav);
+        var buttonTagsExport = controlBuilder.button("Export Tags", this.selectionsTaggedExport.bind(this));
         divControlsFile.appendChild(buttonTagsExport);
-        var buttonTagsImport = d.createElement("button");
-        buttonTagsImport.innerHTML = "Import Tags";
-        buttonTagsImport.onclick = this.selectionsTaggedImport.bind(this);
-        divControlsFile.appendChild(buttonTagsImport);
-        this.buttonTagsImport = buttonTagsImport;
+        this.buttonTagsImport = controlBuilder.button("Import Tags", this.selectionsTaggedImport.bind(this));
+        divControlsFile.appendChild(this.buttonTagsImport);
         this.divControlsFile = divControlsFile;
         return divControlsFile;
     }
     domElementUpdate_BuildIfNecessary_ControlsFilter() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsFilter = d.createElement("div");
         divControlsFilter.style.border = "1px solid";
-        var labelFilter = d.createElement("label");
-        labelFilter.innerHTML = "Filter:";
+        var labelFilter = controlBuilder.label("Filter:");
         divControlsFilter.appendChild(labelFilter);
-        var labelType = d.createElement("label");
-        labelType.innerHTML = "Type:";
+        var labelType = controlBuilder.label("Type:");
         divControlsFilter.appendChild(labelType);
         this.selectFilterType = d.createElement("select");
         this.selectFilterType.style.width = 128;
@@ -521,47 +506,37 @@ class SoundEditor {
             // optionForFilter.entity = filter;
             this.selectFilterType.appendChild(optionForFilter);
         }
-        var labelParameters = d.createElement("label");
-        labelParameters.innerHTML = "Parameters:";
+        var labelParameters = controlBuilder.label("Parameters:");
         divControlsFilter.appendChild(labelParameters);
         this.inputFilterParameters = d.createElement("input");
         this.inputFilterParameters.style.width = 128;
         divControlsFilter.appendChild(this.inputFilterParameters);
-        var buttonFilterSelection = d.createElement("button");
-        buttonFilterSelection.innerHTML = "Filter Selection";
-        buttonFilterSelection.onclick = this.filterSelection.bind(this);
+        var buttonFilterSelection = controlBuilder.button("Filter Selection", this.filterSelection.bind(this));
         divControlsFilter.appendChild(buttonFilterSelection);
         return divControlsFilter;
     }
     domElementUpdate_BuildIfNecessary_ControlsPlayback() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsPlayback = d.createElement("div");
         divControlsPlayback.style.border = "1px solid";
-        var buttonPlay = d.createElement("button");
-        buttonPlay.innerHTML = "Play";
-        buttonPlay.onclick = this.play.bind(this);
+        var buttonPlay = controlBuilder.button("Play", this.play.bind(this));
         divControlsPlayback.appendChild(buttonPlay);
-        var buttonStop = d.createElement("button");
-        buttonStop.innerHTML = "Stop";
-        buttonStop.onclick = this.stop.bind(this);
+        var buttonStop = controlBuilder.button("Stop", this.stop.bind(this));
         divControlsPlayback.appendChild(buttonStop);
-        var buttonRecord = d.createElement("button");
-        buttonRecord.innerHTML = "Record";
-        buttonRecord.onclick = this.record.bind(this);
-        this.buttonRecord = buttonRecord;
-        divControlsPlayback.appendChild(buttonRecord);
+        this.buttonRecord = controlBuilder.button("Record", this.record.bind(this));
+        divControlsPlayback.appendChild(this.buttonRecord);
         this.divControlsPlayback = divControlsPlayback;
         return divControlsPlayback;
     }
     domElementUpdate_BuildIfNecessary_ControlsSelection() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsSelection = d.createElement("div");
         divControlsSelection.style.border = "1px solid";
-        var labelSelected = d.createElement("label");
-        labelSelected.innerHTML = "Selected:";
+        var labelSelected = controlBuilder.label("Selected:");
         divControlsSelection.appendChild(labelSelected);
-        var labelSelectionStartInSeconds = d.createElement("label");
-        labelSelectionStartInSeconds.innerHTML = "Seconds:";
+        var labelSelectionStartInSeconds = controlBuilder.label("Seconds:");
         divControlsSelection.appendChild(labelSelectionStartInSeconds);
         this.inputSelectionStartInSeconds = d.createElement("input");
         this.inputSelectionStartInSeconds.disabled = true; // todo
@@ -569,8 +544,7 @@ class SoundEditor {
         this.inputSelectionStartInSeconds.type = "number";
         this.inputSelectionStartInSeconds.onchange = this.handleEventInputSelectionStartInSecondsChanged.bind(this);
         divControlsSelection.appendChild(this.inputSelectionStartInSeconds);
-        var labelSelectionEndInSeconds = d.createElement("label");
-        labelSelectionEndInSeconds.innerHTML = "to";
+        var labelSelectionEndInSeconds = controlBuilder.label("to");
         divControlsSelection.appendChild(labelSelectionEndInSeconds);
         this.inputSelectionEndInSeconds = d.createElement("input");
         this.inputSelectionEndInSeconds.disabled = true;
@@ -578,45 +552,31 @@ class SoundEditor {
         this.inputSelectionEndInSeconds.type = "number";
         this.inputSelectionEndInSeconds.onchange = this.handleEventInputSelectionEndInSecondsChanged.bind(this);
         divControlsSelection.appendChild(this.inputSelectionEndInSeconds);
-        var buttonSelectAll = d.createElement("button");
-        buttonSelectAll.innerHTML = "All";
-        buttonSelectAll.onclick = this.selectAll.bind(this);
+        var buttonSelectAll = controlBuilder.button("All", this.selectAll.bind(this));
         divControlsSelection.appendChild(buttonSelectAll);
-        var buttonSelectNone = d.createElement("button");
-        buttonSelectNone.innerHTML = "None";
-        buttonSelectNone.onclick = this.selectNone.bind(this);
+        var buttonSelectNone = controlBuilder.button("None", this.selectNone.bind(this));
         divControlsSelection.appendChild(buttonSelectNone);
-        var labelTag = d.createElement("label");
-        labelTag.innerHTML = "Tag:";
+        var labelTag = controlBuilder.label("Tag:");
         divControlsSelection.appendChild(labelTag);
         this.inputTagText = d.createElement("input");
         this.inputTagText.style.width = 128;
         divControlsSelection.appendChild(this.inputTagText);
-        var buttonTagAdd = d.createElement("button");
-        buttonTagAdd.innerHTML = "Tag Selection";
-        buttonTagAdd.onclick = this.selectionTag.bind(this);
+        var buttonTagAdd = controlBuilder.button("Tag Selection", this.selectionTag.bind(this));
         divControlsSelection.appendChild(buttonTagAdd);
-        var buttonTagSelect = d.createElement("button");
-        buttonTagSelect.innerHTML = "Select by Tag";
-        buttonTagSelect.onclick = this.selectionSelectByTag.bind(this);
+        var buttonTagSelect = controlBuilder.button("Select by Tag", this.selectionSelectByTag.bind(this));
         divControlsSelection.appendChild(buttonTagSelect);
-        var buttonTagRemove = d.createElement("button");
-        buttonTagRemove.innerHTML = "Remove Selection by Tag";
-        buttonTagRemove.onclick = this.selectionRemoveByTag.bind(this);
+        var buttonTagRemove = controlBuilder.button("Remove Selection by Tag", this.selectionRemoveByTag.bind(this));
         divControlsSelection.appendChild(buttonTagRemove);
         return divControlsSelection;
     }
     domElementUpdate_BuildIfNecessary_ControlsZoom() {
         var d = document;
+        var controlBuilder = new ControlBuilder(d);
         var divControlsZoom = d.createElement("div");
         divControlsZoom.style.border = "1px solid";
-        var buttonZoomToSelection = d.createElement("button");
-        buttonZoomToSelection.innerHTML = "Zoom to Selection";
-        buttonZoomToSelection.onclick = this.viewZoomToSelection.bind(this);
+        var buttonZoomToSelection = controlBuilder.button("Zoom to Selection", this.viewZoomToSelection.bind(this));
         divControlsZoom.appendChild(buttonZoomToSelection);
-        var buttonZoomToFit = d.createElement("button");
-        buttonZoomToFit.innerHTML = "Zoom to Fit";
-        buttonZoomToFit.onclick = this.viewZoomToFit.bind(this);
+        var buttonZoomToFit = controlBuilder.button("Zoom to Fit", this.viewZoomToFit.bind(this));
         divControlsZoom.appendChild(buttonZoomToFit);
         return divControlsZoom;
     }

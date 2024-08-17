@@ -1,7 +1,7 @@
 
 class FileHelper
 {
-	static loadFileAsText(fileToLoad: any, callback: any): void
+	static loadFileAsTextAndSendToCallback(fileToLoad: any, callback: any): void
 	{
 		var fileReader = new FileReader();
 		fileReader.onload = (fileLoadedEvent) =>
@@ -12,7 +12,7 @@ class FileHelper
 		fileReader.readAsText(fileToLoad, "UTF-8");
 	}
 
-	static loadFileAsBytes(fileToLoad: any, callback: any): void
+	static loadFileAsBytesAndSendToCallback(fileToLoad: any, callback: any): void
 	{
 		var fileReader = new FileReader();
 		fileReader.onload = (fileLoadedEvent) =>
