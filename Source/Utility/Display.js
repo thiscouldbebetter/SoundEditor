@@ -9,6 +9,9 @@ class Display {
         this.canvas.height = this.size.y;
         this.graphics = this.canvas.getContext("2d");
     }
+    clear() {
+        this.graphics.clearRect(0, 0, this.size.x, this.size.y);
+    }
     drawImage(image, pos) {
         this.graphics.drawImage(image, pos.x, pos.y);
     }

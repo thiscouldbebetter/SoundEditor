@@ -20,6 +20,11 @@ class Display
 		this.graphics = this.canvas.getContext("2d");
 	}
 
+	clear(): void
+	{
+		this.graphics.clearRect(0, 0, this.size.x, this.size.y);
+	}
+
 	drawImage(image: any, pos: Coords): void
 	{
 		this.graphics.drawImage(image, pos.x, pos.y);

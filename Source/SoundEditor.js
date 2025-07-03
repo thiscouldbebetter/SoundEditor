@@ -35,7 +35,7 @@ class SoundEditor {
     filterSelection() {
         var track = this.session.trackCurrent();
         if (track == null || this.selectionCurrent == null) {
-            alert("Nothing to filter!");
+            this.statusMessageSet("No selection to filter!");
             return;
         }
         var filterSelectedName = this.selectFilterType.selectedOptions[0].value;
@@ -83,7 +83,7 @@ class SoundEditor {
         }
         var track = this.session.trackCurrent();
         if (track == null) {
-            alert("Nothing to play!");
+            this.statusMessageSet("Nothing to play!");
             return;
         }
         var soundToPlay = track.sounds[0];
@@ -104,7 +104,7 @@ class SoundEditor {
         this.soundPlaying = null;
     }
     record() {
-        alert("Not yet implemented!");
+        this.statusMessageSet("Not yet implemented!");
     }
     stop() {
         if (this.soundPlaying != null) {
@@ -242,7 +242,7 @@ class SoundEditor {
         this.domElementUpdate();
     }
     sessionExportAsWav() {
-        alert("Not yet implemented!");
+        this.statusMessageSet("Not yet implemented!");
         return;
         this.domElementRemove();
         var sessionAsWavFile = this.session.toWavFile();
@@ -257,23 +257,28 @@ class SoundEditor {
         FileHelper.saveTextAsFile(sessionAsJson, sessionFileName);
         this.domElementUpdate();
     }
+    statusMessageSet(messageToSet) {
+        var d = document;
+        var divControlsStatus = d.getElementById("divControlsStatus");
+        divControlsStatus.innerHTML = messageToSet;
+    }
     tagsExportAsSound() {
         var track = this.session.trackCurrent();
         if (track == null) {
-            alert("Nothing to export!");
+            this.statusMessageSet("Nothing to export!");
             return;
         }
         var soundToSelectFrom = track.sounds[0];
         var soundToExport = this.tagsPlay_BuildSound(soundToSelectFrom);
         var wavFileToExport = soundToExport.sourceWavFile;
         var soundToExportAsBytes = wavFileToExport.toBytes();
-        var filename = this.session.tagsToPlay + ".wav";
+        var filename = this.session.tagsToPlay.join("-") + ".wav";
         FileHelper.saveBytesToFile(soundToExportAsBytes, filename);
     }
     tagsPlay() {
         var track = this.session.trackCurrent();
         if (track == null) {
-            alert("Nothing to play!");
+            this.statusMessageSet("Nothing to play!");
             return;
         }
         var soundToSelectFrom = track.sounds[0];
@@ -289,17 +294,17 @@ class SoundEditor {
             samplesForChannels.push([]);
         }
         var soundAsWavFileTarget = new WavFile(soundAsWavFileSource.filePath, soundAsWavFileSource.samplingInfo, samplesForChannels);
-        /*
-        var tagsToPlayAsString =
-            this.session.tagsToPlay; // this.inputTagsToPlay.value;
-        var tagsToPlayAsStrings = tagsToPlayAsString.split(" ");
-        */
         var tagsToPlayAsStrings = this.session.tagsToPlay;
-        for (var t = 0; t < tagsToPlayAsStrings.length; t++) {
-            var tagAsString = tagsToPlayAsStrings[t];
-            var tag = this.session.selectionByTag(tagAsString);
-            if (tag != null) {
-                soundAsWavFileTarget.appendClipFromWavFileBetweenTimesStartAndEnd(soundAsWavFileSource, tag.timeStartInSeconds, tag.timeEndInSeconds);
+        if (tagsToPlayAsStrings.length == 0) {
+            this.statusMessageSet("No tags to play!");
+        }
+        else {
+            for (var t = 0; t < tagsToPlayAsStrings.length; t++) {
+                var tagAsString = tagsToPlayAsStrings[t];
+                var tag = this.session.selectionByTag(tagAsString);
+                if (tag != null) {
+                    soundAsWavFileTarget.appendClipFromWavFileBetweenTimesStartAndEnd(soundAsWavFileSource, tag.timeStartInSeconds, tag.timeEndInSeconds);
+                }
             }
         }
         var returnValue = new Sound("[tags]", soundAsWavFileTarget, 0 // offsetInSeconds
@@ -333,7 +338,7 @@ class SoundEditor {
         this.domElementUpdate();
     }
     trackRemove() {
-        alert("Not yet implemented!");
+        this.statusMessageSet("Not yet implemented!");
     }
     viewSecondsPerPixel() {
         var returnValue = this.viewWidthInSeconds / this.viewSizeInPixels.x;
@@ -405,6 +410,7 @@ class SoundEditor {
             divControls.appendChild(this.domElementUpdate_BuildIfNecessary_ControlsComposite());
             divControls.appendChild(this.domElementUpdate_BuildIfNecessary_ControlsZoom());
             divControls.appendChild(this.domElementUpdate_BuildIfNecessary_ControlsFile());
+            divControls.appendChild(this.domElementUpdate_BuildIfNecessary_ControlsStatus());
             divEditor.appendChild(divControls);
             this.divControls = divControls;
             this.domElement = divEditor;
@@ -578,6 +584,14 @@ class SoundEditor {
         divControlsSelection.appendChild(buttonTagRemove);
         return divControlsSelection;
     }
+    domElementUpdate_BuildIfNecessary_ControlsStatus() {
+        var d = document;
+        var divControlsStatus = d.createElement("div");
+        divControlsStatus.id = "divControlsStatus";
+        divControlsStatus.style.border = "1px solid";
+        divControlsStatus.innerHTML = "Ready.";
+        return divControlsStatus;
+    }
     domElementUpdate_BuildIfNecessary_ControlsZoom() {
         var d = document;
         var controlBuilder = new ControlBuilder(d);
@@ -591,7 +605,7 @@ class SoundEditor {
     }
     domElementUpdate_Controls() {
         this.inputSessionName.value = this.session.name;
-        this.inputTagsToPlay.value = this.session.tagsToPlay;
+        this.inputTagsToPlay.value = this.session.tagsToPlay.join(",");
     }
     domElementUpdate_Cursor() {
         this.inputCursorPosInSeconds.value =
@@ -611,8 +625,9 @@ class SoundEditor {
         }
     }
     domElementUpdate_Waveform() {
-        for (var t = 0; t < this.session.tracks.length; t++) {
-            var track = this.session.tracks[t];
+        var tracks = this.session.tracks;
+        for (var t = 0; t < tracks.length; t++) {
+            var track = tracks[t];
             var domElementForTrack = track.domElementUpdate(this);
             if (domElementForTrack.parentElement == null) {
                 this.divTracks.appendChild(domElementForTrack);
@@ -633,7 +648,7 @@ class SoundEditor {
         this.session.name = event.target.value;
     }
     handleEventInputTagsToPlay_Changed(event) {
-        this.session.tagsToPlay = event.target.value;
+        this.session.tagsToPlay = event.target.value.split(",");
     }
     handleEventKeyDown(event) {
         var key = event.key;

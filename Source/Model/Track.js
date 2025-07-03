@@ -124,6 +124,7 @@ class Track {
             samplesAsPoints.push(samplePosInPixels);
         }
         var displayForSound = this.displayForSound();
+        displayForSound.clear();
         displayForSound.drawPathBetweenPoints(samplesAsPoints);
         displayForSound.drawRectangle(new Coords(0, soundEditor.viewSizeInPixelsHalf.y), viewSizeInPixels, null, // colorFill
         SoundEditor.ColorViewBaseline);

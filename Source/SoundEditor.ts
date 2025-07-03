@@ -120,7 +120,7 @@ class SoundEditor
 
 		if (track == null || this.selectionCurrent == null)
 		{
-			alert("Nothing to filter!");
+			this.statusMessageSet("No selection to filter!");
 			return;
 		}
 
@@ -206,7 +206,7 @@ class SoundEditor
 
 		if (track == null)
 		{
-			alert("Nothing to play!");
+			this.statusMessageSet("Nothing to play!");
 			return;
 		}
 
@@ -245,7 +245,7 @@ class SoundEditor
 
 	record(): void
 	{
-		alert("Not yet implemented!");
+		this.statusMessageSet("Not yet implemented!");
 	}
 
 	stop(): void
@@ -493,7 +493,7 @@ class SoundEditor
 
 	sessionExportAsWav(): void
 	{
-		alert("Not yet implemented!");
+		this.statusMessageSet("Not yet implemented!");
 		return;
 
 		this.domElementRemove();
@@ -517,13 +517,21 @@ class SoundEditor
 		this.domElementUpdate();
 	}
 
+	statusMessageSet(messageToSet: string): void
+	{
+		var d = document;
+		var divControlsStatus =
+			d.getElementById("divControlsStatus");
+		divControlsStatus.innerHTML = messageToSet;
+	}
+
 	tagsExportAsSound(): void
 	{
 		var track = this.session.trackCurrent();
 
 		if (track == null)
 		{
-			alert("Nothing to export!");
+			this.statusMessageSet("Nothing to export!");
 			return;
 		}
 
@@ -533,7 +541,7 @@ class SoundEditor
 		var wavFileToExport = soundToExport.sourceWavFile;
 		var soundToExportAsBytes = wavFileToExport.toBytes();
 
-		var filename = this.session.tagsToPlay + ".wav";
+		var filename = this.session.tagsToPlay.join("-") + ".wav";
 
 		FileHelper.saveBytesToFile
 		(
@@ -548,7 +556,7 @@ class SoundEditor
 
 		if (track == null)
 		{
-			alert("Nothing to play!");
+			this.statusMessageSet("Nothing to play!");
 			return;
 		}
 
@@ -580,26 +588,28 @@ class SoundEditor
 			samplesForChannels
 		);
 
-		/*
-		var tagsToPlayAsString =
-			this.session.tagsToPlay; // this.inputTagsToPlay.value;
-		var tagsToPlayAsStrings = tagsToPlayAsString.split(" ");
-		*/
 		var tagsToPlayAsStrings = this.session.tagsToPlay;
 
-		for (var t = 0; t < tagsToPlayAsStrings.length; t++)
+		if (tagsToPlayAsStrings.length == 0)
 		{
-			var tagAsString = tagsToPlayAsStrings[t];
-			var tag = this.session.selectionByTag(tagAsString);
-
-			if (tag != null)
+			this.statusMessageSet("No tags to play!");
+		}
+		else
+		{
+			for (var t = 0; t < tagsToPlayAsStrings.length; t++)
 			{
-				soundAsWavFileTarget.appendClipFromWavFileBetweenTimesStartAndEnd
-				(
-					soundAsWavFileSource,
-					tag.timeStartInSeconds,
-					tag.timeEndInSeconds
-				);
+				var tagAsString = tagsToPlayAsStrings[t];
+				var tag = this.session.selectionByTag(tagAsString);
+
+				if (tag != null)
+				{
+					soundAsWavFileTarget.appendClipFromWavFileBetweenTimesStartAndEnd
+					(
+						soundAsWavFileSource,
+						tag.timeStartInSeconds,
+						tag.timeEndInSeconds
+					);
+				}
 			}
 		}
 
@@ -675,7 +685,7 @@ class SoundEditor
 
 	trackRemove(): void
 	{
-		alert("Not yet implemented!");
+		this.statusMessageSet("Not yet implemented!");
 	}
 
 	viewSecondsPerPixel(): number
@@ -821,6 +831,11 @@ class SoundEditor
 			divControls.appendChild
 			(
 				this.domElementUpdate_BuildIfNecessary_ControlsFile()
+			);
+
+			divControls.appendChild
+			(
+				this.domElementUpdate_BuildIfNecessary_ControlsStatus()
 			);
 
 			divEditor.appendChild(divControls);
@@ -1152,6 +1167,18 @@ class SoundEditor
 		return divControlsSelection;
 	}
 
+	domElementUpdate_BuildIfNecessary_ControlsStatus(): any
+	{
+		var d = document;
+
+		var divControlsStatus = d.createElement("div");
+		divControlsStatus.id = "divControlsStatus";
+		divControlsStatus.style.border = "1px solid";
+		divControlsStatus.innerHTML = "Ready."
+
+		return divControlsStatus;
+	}
+
 	domElementUpdate_BuildIfNecessary_ControlsZoom(): any
 	{
 		var d = document;
@@ -1180,7 +1207,7 @@ class SoundEditor
 	domElementUpdate_Controls(): void
 	{
 		this.inputSessionName.value = this.session.name;
-		this.inputTagsToPlay.value = this.session.tagsToPlay;
+		this.inputTagsToPlay.value = this.session.tagsToPlay.join(",");
 	}
 
 	domElementUpdate_Cursor(): void
@@ -1209,9 +1236,10 @@ class SoundEditor
 
 	domElementUpdate_Waveform(): void
 	{
-		for (var t = 0; t < this.session.tracks.length; t++)
+		var tracks = this.session.tracks;
+		for (var t = 0; t < tracks.length; t++)
 		{
-			var track = this.session.tracks[t];
+			var track = tracks[t];
 			var domElementForTrack = track.domElementUpdate(this);
 			if (domElementForTrack.parentElement == null)
 			{
@@ -1244,7 +1272,7 @@ class SoundEditor
 
 	handleEventInputTagsToPlay_Changed(event: any): void
 	{
-		this.session.tagsToPlay = event.target.value;
+		this.session.tagsToPlay = event.target.value.split(",");
 	}
 
 	handleEventKeyDown(event: any): void

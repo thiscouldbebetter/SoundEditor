@@ -68,6 +68,7 @@ class Filter
 class Filter_Instances
 {
 	Amplify: Filter;
+	Metronome: Filter;
 	Normalize: Filter;
 	Silence: Filter;
 	Sine: Filter;
@@ -82,6 +83,13 @@ class Filter_Instances
 			"Amplify",
 			this.initialize_DoNothing,
 			this.apply_Amplify
+		);
+
+		this.Metronome = new Filter
+		(
+			"Metronome",
+			this.initialize_DoNothing,
+			this.apply_Metronome
 		);
 
 		this.Normalize = new Filter
@@ -108,6 +116,7 @@ class Filter_Instances
 		this._All =
 		[
 			this.Amplify,
+			this.Metronome,
 			this.Normalize,
 			this.Silence,
 			this.Sine
@@ -199,6 +208,42 @@ class Filter_Instances
 			return sample;
 		}
 		return sample * amplificationFactor;
+	}
+
+	apply_Metronome
+	(
+		sample: number, timeInSeconds: number, parameters: string
+	): number
+	{
+		var beatsPerMinute = parseFloat(parameters);
+
+		if (isNaN(beatsPerMinute) )
+		{
+			beatsPerMinute = 60;
+		}
+
+		if (beatsPerMinute <= 0 || beatsPerMinute > 1000)
+		{
+			beatsPerMinute = 60;
+		}
+
+		var secondsPerBeat = 60 / beatsPerMinute;
+		var clickDurationInBeats = .2;
+
+		var timeInBeats = timeInSeconds / secondsPerBeat;
+		var beatsSinceStartOfBeat =
+			timeInBeats - Math.floor(timeInBeats);
+
+		if (beatsSinceStartOfBeat >= clickDurationInBeats)
+		{
+			sample = 0;
+		}
+		else
+		{
+			sample = sample;
+		}
+
+		return sample;
 	}
 
 	apply_Silence(sample: number, timeInSeconds: number, parameters: string): number

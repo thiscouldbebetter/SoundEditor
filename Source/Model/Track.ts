@@ -265,7 +265,7 @@ class Track
 		}
 
 		var displayForSound = this.displayForSound();
-
+		displayForSound.clear();
 		displayForSound.drawPathBetweenPoints(samplesAsPoints);
 
 		displayForSound.drawRectangle
