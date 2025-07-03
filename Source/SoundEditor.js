@@ -43,6 +43,8 @@ class SoundEditor {
         var parametersForFilter = this.inputFilterParameters.value;
         var sound = track.sounds[0];
         var soundSource = sound.sourceWavFile;
+        parametersForFilter =
+            filterSelected.initializeForSoundSource(soundSource, parametersForFilter);
         var samplingInfo = soundSource.samplingInfo;
         var samplesPerSecond = samplingInfo.samplesPerSecond;
         var selection = this.selectionCurrent;
@@ -69,7 +71,11 @@ class SoundEditor {
                 samplesForChannel[sampleIndex] = sample;
             }
         }
+        this.hasViewBeenUpdatedSet();
         this.domElementUpdate();
+    }
+    hasViewBeenUpdatedSet() {
+        this.hasViewBeenUpdated = true;
     }
     play() {
         if (this.soundPlaying != null) {
@@ -343,13 +349,13 @@ class SoundEditor {
         }
         var displacementInSeconds = distanceToMoveInSeconds * direction;
         this.viewOffsetInSeconds = NumberHelper.trimNumberToMax(this.viewOffsetInSeconds + displacementInSeconds, this.session.durationInSeconds() - this.viewWidthInSeconds);
-        this.hasViewBeenUpdated = true;
+        this.hasViewBeenUpdatedSet();
         this.domElementUpdate();
     }
     viewZoomToFit() {
         this.viewOffsetInSeconds = 0;
         this.viewWidthInSeconds = this.session.durationInSeconds();
-        this.hasViewBeenUpdated = true;
+        this.hasViewBeenUpdatedSet();
         this.domElementUpdate();
     }
     viewZoomToSelection() {
@@ -362,7 +368,7 @@ class SoundEditor {
                 this.viewOffsetInSeconds = timeStartInSeconds;
                 this.viewWidthInSeconds = selectionDurationInSeconds;
                 this.selectionCurrent = null;
-                this.hasViewBeenUpdated = true;
+                this.hasViewBeenUpdatedSet();
                 this.domElementUpdate();
             }
         }

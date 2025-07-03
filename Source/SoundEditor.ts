@@ -132,6 +132,14 @@ class SoundEditor
 		var sound = track.sounds[0];
 
 		var soundSource = sound.sourceWavFile;
+
+		parametersForFilter =
+			filterSelected.initializeForSoundSource
+			(
+				soundSource,
+				parametersForFilter
+			);
+
 		var samplingInfo = soundSource.samplingInfo;
 		var samplesPerSecond = samplingInfo.samplesPerSecond;
 
@@ -178,7 +186,13 @@ class SoundEditor
 			}
 		}
 
+		this.hasViewBeenUpdatedSet();
 		this.domElementUpdate();
+	}
+
+	hasViewBeenUpdatedSet(): void
+	{
+		this.hasViewBeenUpdated = true;
 	}
 
 	play(): void
@@ -694,7 +708,7 @@ class SoundEditor
 			this.session.durationInSeconds() - this.viewWidthInSeconds
 		);
 
-		this.hasViewBeenUpdated = true;
+		this.hasViewBeenUpdatedSet();
 
 		this.domElementUpdate();
 	}
@@ -703,7 +717,7 @@ class SoundEditor
 	{
 		this.viewOffsetInSeconds = 0;
 		this.viewWidthInSeconds = this.session.durationInSeconds();
-		this.hasViewBeenUpdated = true;
+		this.hasViewBeenUpdatedSet();
 		this.domElementUpdate();
 	}
 
@@ -724,7 +738,7 @@ class SoundEditor
 				this.viewWidthInSeconds = selectionDurationInSeconds;
 
 				this.selectionCurrent = null;
-				this.hasViewBeenUpdated = true;
+				this.hasViewBeenUpdatedSet();
 
 				this.domElementUpdate();
 			}
