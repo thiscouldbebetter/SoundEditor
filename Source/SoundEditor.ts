@@ -601,27 +601,33 @@ class SoundEditor
 
 	trackAdd(): void
 	{
-		var d = document;
-		var inputFileToLoad = d.createElement("input");
-		inputFileToLoad.type = "file";
-		var callback = this.trackAdd_LoadComplete.bind(this);
-		inputFileToLoad.onchange = (event) =>
-		{
-			var srcElement: any = event.srcElement;
-			var fileToLoad = srcElement.files[0];
-			FileHelper.loadFileAsBytesAndSendToCallback
-			(
-				fileToLoad,
-				callback
-			);
-			srcElement.parentElement.removeChild(srcElement);
-		}
+		var inputFileToLoadAlreadyPresent =
+			this.divControlsFile.getElementsByTagName("input").length > 0;
 
-		this.divControlsFile.insertBefore
-		(
-			inputFileToLoad,
-			this.buttonTrackAdd.nextSibling
-		);
+		if (inputFileToLoadAlreadyPresent == false)
+		{
+			var d = document;
+			var inputFileToLoad = d.createElement("input");
+			inputFileToLoad.type = "file";
+			var callback = this.trackAdd_LoadComplete.bind(this);
+			inputFileToLoad.onchange = (event) =>
+			{
+				var srcElement: any = event.srcElement;
+				var fileToLoad = srcElement.files[0];
+				FileHelper.loadFileAsBytesAndSendToCallback
+				(
+					fileToLoad,
+					callback
+				);
+				srcElement.parentElement.removeChild(srcElement);
+			}
+
+			this.divControlsFile.insertBefore
+			(
+				inputFileToLoad,
+				this.buttonTrackAdd.nextSibling
+			);
+		}
 	}
 
 	trackAdd_LoadComplete

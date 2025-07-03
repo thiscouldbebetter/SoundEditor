@@ -35,10 +35,19 @@ class Session {
             track.domElementRemove();
         }
     }
-    // json
+    // Serializable.
+    static prototypesSetOnObject(sessionAsObject) {
+        Object.setPrototypeOf(sessionAsObject, Session.prototype);
+        var session = sessionAsObject;
+        session.tracks
+            .forEach(x => Track.prototypesSetOnObject(x));
+        session.selectionsTagged
+            .forEach(x => Selection_.prototypesSetOnObject(x));
+        return session;
+    }
     static fromStringJSON(sessionAsJSON) {
-        var session = JSON.parse(sessionAsJSON);
-        Object.setPrototypeOf(session, Session.prototype);
+        var sessionAsObject = JSON.parse(sessionAsJSON);
+        var session = Session.prototypesSetOnObject(sessionAsObject);
         var tracks = session.tracks;
         for (var i = 0; i < tracks.length; i++) {
             var track = tracks[i];

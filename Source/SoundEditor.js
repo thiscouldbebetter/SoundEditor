@@ -301,17 +301,20 @@ class SoundEditor {
         return returnValue;
     }
     trackAdd() {
-        var d = document;
-        var inputFileToLoad = d.createElement("input");
-        inputFileToLoad.type = "file";
-        var callback = this.trackAdd_LoadComplete.bind(this);
-        inputFileToLoad.onchange = (event) => {
-            var srcElement = event.srcElement;
-            var fileToLoad = srcElement.files[0];
-            FileHelper.loadFileAsBytesAndSendToCallback(fileToLoad, callback);
-            srcElement.parentElement.removeChild(srcElement);
-        };
-        this.divControlsFile.insertBefore(inputFileToLoad, this.buttonTrackAdd.nextSibling);
+        var inputFileToLoadAlreadyPresent = this.divControlsFile.getElementsByTagName("input").length > 0;
+        if (inputFileToLoadAlreadyPresent == false) {
+            var d = document;
+            var inputFileToLoad = d.createElement("input");
+            inputFileToLoad.type = "file";
+            var callback = this.trackAdd_LoadComplete.bind(this);
+            inputFileToLoad.onchange = (event) => {
+                var srcElement = event.srcElement;
+                var fileToLoad = srcElement.files[0];
+                FileHelper.loadFileAsBytesAndSendToCallback(fileToLoad, callback);
+                srcElement.parentElement.removeChild(srcElement);
+            };
+            this.divControlsFile.insertBefore(inputFileToLoad, this.buttonTrackAdd.nextSibling);
+        }
     }
     trackAdd_LoadComplete(wavFileLoadedAsFileObject, wavFileAsBytes) {
         var wavFileName = wavFileLoadedAsFileObject.name;

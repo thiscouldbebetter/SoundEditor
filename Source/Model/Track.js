@@ -17,6 +17,13 @@ class Track {
         return soundEndInSecondsMax;
     }
     // dom
+    displayForSound() {
+        if (this._displayForSound == null) {
+            this._displayForSound = new Display(this.display.size);
+            this._displayForSound.initialize();
+        }
+        return this._displayForSound;
+    }
     domElementRemove() {
         delete this.domElement;
         delete this.display;
@@ -93,7 +100,8 @@ class Track {
         if (soundEditor.hasViewBeenUpdated) {
             this.domElementUpdate_Sound_Refresh(soundEditor, sound);
         }
-        this.display.drawImage(this.displayForSound.canvas, new Coords(0, 0));
+        var canvas = this._displayForSound.canvas;
+        this.display.drawImage(canvas, new Coords(0, 0));
     }
     domElementUpdate_Sound_Refresh(soundEditor, sound) {
         soundEditor.hasViewBeenUpdated = false;
@@ -108,44 +116,38 @@ class Track {
         var viewHeightInPixelsHalf = soundEditor.viewSizeInPixelsHalf.y;
         var viewOffsetInSamples = Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
         var viewWidthInSamples = Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
-        var samplePosInPixels = new Coords(0, viewHeightInPixelsHalf);
-        //var sampleValue = 0;
-        this.displayForSound = new Display(this.display.size);
-        this.displayForSound.initialize();
-        this.displayForSound.graphics.beginPath();
+        var samplePosInPixelsStart = new Coords(0, viewHeightInPixelsHalf);
+        var samplesAsPoints = [samplePosInPixelsStart];
         var byteConverter = new ByteConverter(bitsPerSample);
         for (var i = 0; i < viewWidthInSamples; i++) {
-            this.domElementUpdate_Sound_Refresh_Sample(viewOffsetInSamples, soundOffsetInSamples, samples, viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples, samplePosInPixels, byteConverter, i);
+            var samplePosInPixels = this.domElementUpdate_Sound_Refresh_Sample(viewOffsetInSamples, soundOffsetInSamples, samples, viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples, byteConverter, i);
+            samplesAsPoints.push(samplePosInPixels);
         }
-        this.displayForSound.graphics.stroke();
-        this.displayForSound.drawRectangle(new Coords(0, soundEditor.viewSizeInPixelsHalf.y), viewSizeInPixels, null, // colorFill
+        var displayForSound = this.displayForSound();
+        displayForSound.drawPathBetweenPoints(samplesAsPoints);
+        displayForSound.drawRectangle(new Coords(0, soundEditor.viewSizeInPixelsHalf.y), viewSizeInPixels, null, // colorFill
         SoundEditor.ColorViewBaseline);
     }
-    domElementUpdate_Sound_Refresh_Sample(viewOffsetInSamples, soundOffsetInSamples, samples, viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples, samplePosInPixels, byteConverter, i) {
+    domElementUpdate_Sound_Refresh_Sample(viewOffsetInSamples, soundOffsetInSamples, samples, viewWidthInPixels, viewHeightInPixelsHalf, viewWidthInSamples, byteConverter, i) {
+        var samplePosInPixels;
         var sampleIndex = i
             + viewOffsetInSamples
             - soundOffsetInSamples;
         if (sampleIndex < 0 || sampleIndex >= samples.length) {
-            throw "Error!";
+            throw new Error("Sample index is out of range.");
         }
-        else {
-            var samplePosInPixelsXNext = i
-                * viewWidthInPixels
-                / viewWidthInSamples;
-            if (samplePosInPixelsXNext != samplePosInPixels.x) {
-                var sampleBytes = samples[sampleIndex];
-                var sampleValue = byteConverter.integerToFloat(sampleBytes);
-                samplePosInPixels.x = samplePosInPixelsXNext;
-                samplePosInPixels.y =
-                    viewHeightInPixelsHalf
-                        +
-                            (sampleValue
-                                * viewHeightInPixelsHalf
-                                * .8 // max amplitude
-                            );
-                this.displayForSound.graphics.lineTo(samplePosInPixels.x, samplePosInPixels.y);
-            }
-        }
+        var samplePosInPixelsXNext = i
+            * viewWidthInPixels
+            / viewWidthInSamples;
+        var sampleBytes = samples[sampleIndex];
+        var sampleValue = byteConverter.integerToFloat(sampleBytes);
+        var samplePosInPixels = new Coords(samplePosInPixelsXNext, viewHeightInPixelsHalf
+            +
+                (sampleValue
+                    * viewHeightInPixelsHalf
+                    * .8 // max amplitude
+                ));
+        return samplePosInPixels;
     }
     domElementUpdate_Title(viewSizeInPixels) {
         this.display.drawText(this.name, new Coords(2, viewSizeInPixels.y - SoundEditor.TextHeightInPixels * .2), SoundEditor.ColorViewText, SoundEditor.ColorViewBackground);
@@ -158,6 +160,13 @@ class Track {
         this.display.drawText(viewMinInSeconds, new Coords(0, textHeightInPixels), SoundEditor.ColorViewText, SoundEditor.ColorViewBackground);
         this.display.drawText(viewMaxInSeconds, new Coords(soundEditor.viewSizeInPixels.x
             - (viewMaxInSeconds.length * textHeightInPixels * .6), textHeightInPixels), SoundEditor.ColorViewText, SoundEditor.ColorViewBackground);
+    }
+    // Serializable.
+    static prototypesSetOnObject(trackAsObject) {
+        Object.setPrototypeOf(trackAsObject, Track.prototype);
+        var track = trackAsObject;
+        track.sounds.forEach(x => Sound.prototypesSetOnObject(x));
+        return track;
     }
     // event
     handleEventMouseDown(event) {

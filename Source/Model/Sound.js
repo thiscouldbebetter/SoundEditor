@@ -35,4 +35,11 @@ class Sound {
             this.domElementAudio = null;
         }
     }
+    // Serializable.
+    static prototypesSetOnObject(soundAsObject) {
+        Object.setPrototypeOf(soundAsObject, Sound.prototype);
+        var sound = soundAsObject;
+        WavFile.objectPrototypesSet(sound.sourceWavFile);
+        return sound;
+    }
 }

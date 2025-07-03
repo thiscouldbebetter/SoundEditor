@@ -68,12 +68,23 @@ class Session
 		}
 	}
 
-	// json
+	// Serializable.
+
+	static prototypesSetOnObject(sessionAsObject: unknown): Session
+	{
+		Object.setPrototypeOf(sessionAsObject, Session.prototype);
+		var session = sessionAsObject as Session;
+		session.tracks
+			.forEach(x => Track.prototypesSetOnObject(x) );
+		session.selectionsTagged
+			.forEach(x => Selection_.prototypesSetOnObject(x) );
+		return session as Session;
+	}
 
 	static fromStringJSON(sessionAsJSON: string): Session
 	{
-		var session = JSON.parse(sessionAsJSON);
-		Object.setPrototypeOf(session, Session.prototype);
+		var sessionAsObject = JSON.parse(sessionAsJSON);
+		var session = Session.prototypesSetOnObject(sessionAsObject);
 
 		var tracks = session.tracks;
 		for (var i = 0; i < tracks.length; i++)

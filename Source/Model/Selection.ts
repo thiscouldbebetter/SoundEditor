@@ -183,4 +183,13 @@ class Selection_
 
 		return returnValue;
 	}
+
+	// Serializable.
+
+	static prototypesSetOnObject(selectionAsObject: unknown): Selection_
+	{
+		Object.setPrototypeOf(selectionAsObject, Selection_.prototype);
+		var selection = selectionAsObject as Selection_;
+		return selection as Selection_;
+	}
 }

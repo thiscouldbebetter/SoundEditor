@@ -25,6 +25,19 @@ class Display
 		this.graphics.drawImage(image, pos.x, pos.y);
 	}
 
+	drawPathBetweenPoints(points: Coords[]): void
+	{
+		this.graphics.beginPath();
+		var point0 = points[0];
+		this.graphics.moveTo(point0.x, point0.y);
+		for (var i = 1; i < points.length; i++)
+		{
+			var point = points[i];
+			this.graphics.lineTo(point.x, point.y);
+		}
+		this.graphics.stroke();
+	}
+
 	drawRectangle(pos: Coords, size: Coords, colorFill: string, colorBorder: string)
 	{
 		var g = this.graphics;

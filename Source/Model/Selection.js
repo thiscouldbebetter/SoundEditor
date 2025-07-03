@@ -89,4 +89,10 @@ class Selection_ {
             + this.tag;
         return returnValue;
     }
+    // Serializable.
+    static prototypesSetOnObject(selectionAsObject) {
+        Object.setPrototypeOf(selectionAsObject, Selection_.prototype);
+        var selection = selectionAsObject;
+        return selection;
+    }
 }

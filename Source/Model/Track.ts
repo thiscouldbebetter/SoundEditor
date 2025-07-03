@@ -5,7 +5,7 @@ class Track
 	sounds: Sound[];
 
 	display: Display;
-	displayForSound: Display;
+	_displayForSound: Display;
 	domElement: any;
 
 	constructor(name: string, sounds: Sound[])
@@ -35,6 +35,16 @@ class Track
 	}
 
 	// dom
+
+	displayForSound(): Display
+	{
+		if (this._displayForSound == null)
+		{
+			this._displayForSound = new Display(this.display.size);
+			this._displayForSound.initialize();
+		}
+		return this._displayForSound;
+	}
 
 	domElementRemove(): void
 	{
@@ -204,7 +214,8 @@ class Track
 			this.domElementUpdate_Sound_Refresh(soundEditor, sound);
 		}
 
-		this.display.drawImage(this.displayForSound.canvas, new Coords(0, 0));
+		var canvas = this._displayForSound.canvas;
+		this.display.drawImage(canvas, new Coords(0, 0));
 	}
 
 	domElementUpdate_Sound_Refresh(soundEditor: SoundEditor, sound: Sound): void
@@ -230,34 +241,34 @@ class Track
 			Math.round(soundEditor.viewOffsetInSeconds * samplesPerSecond);
 		var viewWidthInSamples =
 			Math.round(soundEditor.viewWidthInSeconds * samplesPerSecond);
-		var samplePosInPixels =
+		var samplePosInPixelsStart =
 			new Coords(0, viewHeightInPixelsHalf);
-		//var sampleValue = 0;
-
-		this.displayForSound = new Display(this.display.size);
-		this.displayForSound.initialize();
-		this.displayForSound.graphics.beginPath();
-
+		var samplesAsPoints = [ samplePosInPixelsStart ];
 		var byteConverter = new ByteConverter(bitsPerSample);
-		
+
 		for (var i = 0; i < viewWidthInSamples; i++)
 		{
-			this.domElementUpdate_Sound_Refresh_Sample
-			(
-				viewOffsetInSamples,
-				soundOffsetInSamples,
-				samples,
-				viewWidthInPixels,
-				viewHeightInPixelsHalf,
-				viewWidthInSamples,
-				samplePosInPixels,
-				byteConverter, i
-			);
+			var samplePosInPixels =
+				this.domElementUpdate_Sound_Refresh_Sample
+				(
+					viewOffsetInSamples,
+					soundOffsetInSamples,
+					samples,
+					viewWidthInPixels,
+					viewHeightInPixelsHalf,
+					viewWidthInSamples,
+					byteConverter,
+					i
+				);
+
+			samplesAsPoints.push(samplePosInPixels);
 		}
 
-		this.displayForSound.graphics.stroke();
+		var displayForSound = this.displayForSound();
 
-		this.displayForSound.drawRectangle
+		displayForSound.drawPathBetweenPoints(samplesAsPoints);
+
+		displayForSound.drawRectangle
 		(
 			new Coords(0, soundEditor.viewSizeInPixelsHalf.y),
 			viewSizeInPixels,
@@ -274,11 +285,12 @@ class Track
 		viewWidthInPixels: number,
 		viewHeightInPixelsHalf: number,
 		viewWidthInSamples: number,
-		samplePosInPixels: Coords,
 		byteConverter: ByteConverter,
 		i: number
-	): void
+	): Coords
 	{
+		var samplePosInPixels: Coords;
+
 		var sampleIndex =
 			i
 			+ viewOffsetInSamples
@@ -286,42 +298,32 @@ class Track
 
 		if (sampleIndex < 0 || sampleIndex >= samples.length)
 		{
-			throw "Error!";
+			throw new Error("Sample index is out of range.");
 		}
-		else
-		{
-			var samplePosInPixelsXNext =
-				i
-				* viewWidthInPixels
-				/ viewWidthInSamples;
 
-			if (samplePosInPixelsXNext != samplePosInPixels.x)
-			{
-				var sampleBytes = samples[sampleIndex];
+		var samplePosInPixelsXNext =
+			i
+			* viewWidthInPixels
+			/ viewWidthInSamples;
 
-				var sampleValue = byteConverter.integerToFloat
-				(
-					sampleBytes
-				);
+		var sampleBytes = samples[sampleIndex];
 
-				samplePosInPixels.x = samplePosInPixelsXNext;
+		var sampleValue =
+			byteConverter.integerToFloat(sampleBytes);
 
-				samplePosInPixels.y =
-					viewHeightInPixelsHalf
-					+
-					(
-						sampleValue
-						* viewHeightInPixelsHalf
-						* .8 // max amplitude
-					);
+		var samplePosInPixels = new Coords
+		(
+			samplePosInPixelsXNext,
+			viewHeightInPixelsHalf
+			+
+			(
+				sampleValue
+				* viewHeightInPixelsHalf
+				* .8 // max amplitude
+			)
+		);
 
-				this.displayForSound.graphics.lineTo
-				(
-					samplePosInPixels.x,
-					samplePosInPixels.y
-				);
-			}
-		}
+		return samplePosInPixels;
 	}
 
 	domElementUpdate_Title(viewSizeInPixels: Coords): void
@@ -372,6 +374,16 @@ class Track
 			SoundEditor.ColorViewText,
 			SoundEditor.ColorViewBackground
 		);
+	}
+
+	// Serializable.
+
+	static prototypesSetOnObject(trackAsObject: unknown): Track
+	{
+		Object.setPrototypeOf(trackAsObject, Track.prototype);
+		var track = trackAsObject as Track;
+		track.sounds.forEach(x => Sound.prototypesSetOnObject(x) );
+		return track;
 	}
 
 	// event
